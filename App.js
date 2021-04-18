@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import AnimatedSplash from "react-native-animated-splash-screen";
+// import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues
 
 import HomeScreen from './screens/Home';
 import SettingsScreen from './screens/Settings';
@@ -18,6 +19,10 @@ export default function App() {
 			setLoaded(true);
 		}, 3000);
 	}, []);
+
+	// useEffect(() => {
+	// 	ImmersiveMode.fullLayout(true);
+	// }, []);
 
 	return (
 		<AnimatedSplash
@@ -39,11 +44,11 @@ const NavigationSection = () => (
 			screenOptions={({route}) => ({
 				tabBarIcon: ({focused, color, size}) => {
 					let iconName;
-					if (route.Name == 'Home') {
+					if (route.name == 'Home') {
 						iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline'
 					} else if (route.name == 'Settings') {
 						iconName = focused ? 'ios-list' : 'ios-list-outline';
-					}	
+					}
 					// You can return any component that you like here!
 					return <Ionicons name={iconName} size={size} color={color}/>;
 				},
