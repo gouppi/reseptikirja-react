@@ -2,15 +2,23 @@ import React, {useState, useEffect} from 'react';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { createStackNavigator } from '@react-navigation/stack';
+
+
+import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs!
 
 import AnimatedSplash from "react-native-animated-splash-screen";
 // import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues
 
+import RecipeScreen from './screens/Recipe';
 import HomeScreen from './screens/Home';
+import CardsScreen from './screens/Cards';
 import SettingsScreen from './screens/Settings';
 
+const ThemeContext = React.createContext('light');
+
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
 	const [loaded, setLoaded] = useState(false);
@@ -40,6 +48,8 @@ export default function App() {
 
 const NavigationSection = () => (
 	<NavigationContainer>
+		{/* <Stack.Navigator>
+			<Stack.Screen name="Recipe" component={R} */}
 		<Tab.Navigator
 			screenOptions={({route}) => ({
 				tabBarIcon: ({focused, color, size}) => {
@@ -58,7 +68,8 @@ const NavigationSection = () => (
 				inactiveTintColor:'gray',
 			}}
 			>
-			<Tab.Screen name="Home" component={HomeScreen} />
+			<Tab.Screen name="Home" component={CardsScreen} />
+			<Tab.Screen name="Recipe" component={RecipeScreen} />
 			<Tab.Screen name="Settings" component={SettingsScreen} />
 		</Tab.Navigator>
 	</NavigationContainer>
