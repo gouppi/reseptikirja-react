@@ -45,18 +45,29 @@ export default function App() {
 	);
 }
 
+const CardsWrapper = () => {
+	return (
+		<Stack.Navigator
+			screenOptions={{headerShown: false}}>
+			<Stack.Screen
+				name="Home"
+				component={CardsScreen}
+				/>
+			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
+		</Stack.Navigator>
+	)
+}
+
 
 const NavigationSection = () => (
 	<NavigationContainer>
-		{/* <Stack.Navigator>
-			<Stack.Screen name="Recipe" component={R} */}
 		<Tab.Navigator
 			screenOptions={({route}) => ({
 				tabBarIcon: ({focused, color, size}) => {
 					let iconName;
-					if (route.name == 'Home') {
+					if (route.name == 'Reseptit') {
 						iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline'
-					} else if (route.name == 'Settings') {
+					} else if (route.name == 'Asetukset') {
 						iconName = focused ? 'ios-list' : 'ios-list-outline';
 					}
 					// You can return any component that you like here!
@@ -64,13 +75,15 @@ const NavigationSection = () => (
 				},
 			})}
 			tabBarOptions={{
-				activeTintColor: 'tomato',
+				activeTintColor: '#8BCF89',
 				inactiveTintColor:'gray',
+
 			}}
 			>
-			<Tab.Screen name="Home" component={CardsScreen} />
-			<Tab.Screen name="Recipe" component={RecipeScreen} />
-			<Tab.Screen name="Settings" component={SettingsScreen} />
+			<Tab.Screen name="Reseptit" component={CardsWrapper} />
+			{/* <Tab.Screen name="Recipe" component={RecipeScreen} /> */}
+			<Tab.Screen name="Asetukset" component={SettingsScreen} />
 		</Tab.Navigator>
+			{/* <Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}}/> */}
 	</NavigationContainer>
 );
