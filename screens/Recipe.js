@@ -1,24 +1,45 @@
-import React from 'react';
-import {View, Text, StyleSheet,Image} from 'react-native';
+import React,{useState} from 'react';
+import { Tab, TabView } from 'react-native-easy-tabs';
+
+import {View, Text, StyleSheet,Image,Button} from 'react-native';
 
 export default function Recipe({route,navigation}) {
+	const [currentTab, setCurrentTab] = useState(0);
 	const { recipe } = route.params;
+
 	return (
 		<View style={styles.recipe}>
 			<Image
 				style={styles.cardImage}
-				source={{
-					uri: recipe.img,
-				}}
+				source={{uri: recipe.img}}
 				/>
-				<View style={styles.recipeContent}>
-					<Text style={styles.recipeTitle}>{recipe.title}</Text>
-					<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
-					<View style={styles.recipeTabs}>
-						<Text>Ainesosat</Text>
-						<Text>Resepti</Text>
-					</View>
+			<View style={styles.recipeContent}>
+				<Text style={styles.recipeTitle}>{recipe.title}</Text>
+				<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
+
+				<View style={styles.buttonsContainer}>
+					<Button style={styles.button} title="Ainesosat" onPress={() => setCurrentTab(0)} />
+					<Button style={styles.button} title="Resepti" onPress={() => setCurrentTab(1)} />
 				</View>
+
+				<View style={{width:'100%'}}>
+				<TabView selectedTabIndex={currentTab}>
+					<Tab>
+						<View style={styles.container}>
+							<Text style={styles.paragraph}>This is tab 1</Text>
+						</View>
+					</Tab>
+
+					<Tab lazy>
+						<View style={styles.container}>
+						<Text style={styles.paragraph}>
+							Second tab here, yo
+						</Text>
+						</View>
+					</Tab>
+				</TabView>
+				</View>
+			</View>
 		</View>
 	);
 }
@@ -33,8 +54,27 @@ const styles = StyleSheet.create({
 		paddingRight: 15,
 		//backgroundColor:"#fff",
 		height:"100%",
-
 	},
+	fill: {
+		 flex:1,
+	},
+
+	buttonsContainer: {
+		marginTop:4,
+		flexDirection:'row',
+		justifyContent:'space-evenly',
+		width:'100%',
+	},
+	button: {
+		backgroundColor: "#fff",
+		color:"#000",
+		fontSize:20
+	},
+	container: {
+		padding:10,
+		flex:1,
+	},
+
 	recipeContent: {
 		flex:1,
 		height:"100%",
