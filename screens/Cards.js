@@ -21,8 +21,8 @@ export default function Cards({ navigation }) {
 			time: 45,
 			ingredients: [
 				{
-					section: "asd",
-					ingredients: [
+					section: "Pohja",
+					data: [
 						"5dl Vehnäjauhoa",
 						"4 Kananmunaa",
 						"2dl Maitoa",
@@ -35,7 +35,7 @@ export default function Cards({ navigation }) {
 				},
 				{
 					section: "Kuorrutus",
-					ingredients: [
+					data: [
 						"75g voita",
 						"noin desi vahvaa kahvia",
 						"4dl (240g) tomusokeria",
@@ -45,26 +45,33 @@ export default function Cards({ navigation }) {
 				},
 				{
 					section: "Pinnalle",
-					ingredients: ["nonparelleja"],
+					data: ["nonparelleja"],
 				},
 			],
-			steps: {
-				"": [
+			steps: [
+				{
+					section: "Pohja",
+					data: [
 					"Vatkaa huoneenlämpöiset munat ja sokeri paksuksi, vaaleaksi vaahdoksi.",
 					"Sulata voi kattilassa tai mikrossa. Lisää voisulaan kylmä maito, niin se jäähtyy sopivaksi.",
 					"Yhdistä kuivat aineet.",
 					"Sekoita muna-sokerivaahtoon voi-maitoseos sekä kuivat aineet sihdin läpi. Sekoita varovasti nuolijalla tasaiseksi.",
 					"Kaada leivinpaperille uunipannulle n. 30 - 40 cm.",
 					"Kypsennä uunin keskiosassa 200 asteessa n. 15 min. Anna jäähtyä ennen kuorruttamista.",
-				],
-				Kuorrutus: [
-					"Sulata voi kattilassa.",
-					"Lisää kahvi. Sihtaa muut aineet siivilän läpi. Sekoita, kunnes tasaista.",
-					"Kaada hieman lämmin kuorrutus pohjan keskelle. (Kuumana kuorrute on liian löysää levitettäväksi ja silloin se imeytyy pohjaan. Kuorrutteen jäähtyessä, se paksuuntuu sopivaksi.) Anna valua reunoja kohti.",
-					"Levitä tarvittaessa lastalla reunoille.",
-					"Koristele nonparelleilla ennen kuin kuorrutus kovettuu. Leikkaa 24 - 30 palaa.",
-				],
-			},
+					],
+					time: 15
+				},
+				{
+					section: "Kuorrutus",
+					data: [
+						"Sulata voi kattilassa.",
+						"Lisää kahvi. Sihtaa muut aineet siivilän läpi. Sekoita, kunnes tasaista.",
+						"Kaada hieman lämmin kuorrutus pohjan keskelle. (Kuumana kuorrute on liian löysää levitettäväksi ja silloin se imeytyy pohjaan. Kuorrutteen jäähtyessä, se paksuuntuu sopivaksi.) Anna valua reunoja kohti.",
+						"Levitä tarvittaessa lastalla reunoille.",
+						"Koristele nonparelleilla ennen kuin kuorrutus kovettuu. Leikkaa 24 - 30 palaa.",
+					],
+				}
+			],
 		},
 		{
 			id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",

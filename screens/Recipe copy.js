@@ -1,14 +1,19 @@
-import React,{useState, useEffect, useCallback,useRef} from 'react';
-import PagerView from 'react-native-pager-view';
+import React,{useState, useEffect} from 'react';
+import { Tab, TabView } from 'react-native-easy-tabs';
 
-import {View, Text, StyleSheet,Image,Button,SectionList,TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet,Image,Button,SectionList,Dimensions,TouchableOpacity} from 'react-native';
 
 export default function Recipe({route,navigation}) {
 	const [currentTab, setCurrentTab] = useState(0);
+	const [width, setWidth] = useState(Dimensions.get('window').width);
 	const { recipe } = route.params;
 
-	const ref = useRef();
-	const setPage = useCallback((page) => ref.current?.setPage(page), [true]);
+	useEffect(() => {
+		console.log("Setting window change event listener");
+		Dimensions.addEventListener('change', ({window}) => {
+			setWidth(window.width);
+		})
+	}, []);
 
 	return (
 		<View style={styles.recipe}>
@@ -23,69 +28,59 @@ export default function Recipe({route,navigation}) {
 					<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
 				</View>
 				<View style={styles.buttonsContainer}>
-					<TouchableOpacity onPress={() => {setCurrentTab(0); setPage(0);}}>
+					<TouchableOpacity onPress={() => setCurrentTab(0)}>
 						<Text style={currentTab == 0 ? styles.btnActive : styles.btnNotActive}>Ainesosat</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity onPress={() => {setCurrentTab(1); setPage(1); } }>
+					<TouchableOpacity onPress={() => setCurrentTab(1)}>
 						<Text style={currentTab == 1 ? styles.btnActive : styles.btnNotActive}>Resepti</Text>
 					</TouchableOpacity>
+					{/* <Button title="Ainesosat" onPress={() => setCurrentTab(0)} /> */}
+					{/* <Button title="Resepti" onPress={() => setCurrentTab(1)} /> */}
+
 				</View>
 
-				<PagerView
-					ref={ref}
-					style={{flex:1}}
-					onPageScroll={(e) => {
-							setCurrentTab(e.nativeEvent.position);
-					}}
-					initialPage={currentTab}
-					>
+				<TabView
+					// style={{marginVertical:8,marginHorizontal:16, textWrap:'wrap'}}
+					selectedTabIndex={currentTab}
+				>
+					{/* <Tab style={{flex:1,marginVertical:8,marginHorizontal:16, textWrap:'wrap'}}> */}
+					<Tab>
+						<View style={{:16, backgroundColor:"#d8c7f2"}} >
+						{/* <View style={{justifyContent:"center",alignItems:"center"}}>
+							<Text>Ainesosat</Text>
+						</View> */}
+						<SectionList
+								showsVerticalScrollIndicator={false}
+								showsHorizontalScrollIndicator={false}
+								sections={recipe.ingredients}
+								keyExtractor={(item, index) => item + index}
+								renderItem={({item}) => (<Text>{item}</Text>)}
+								renderSectionHeader={({ section: { section } }) => (
+									// <View style={{borderBottomWidth:1}}>
+										<Text style={{fontSize:20}}>{section}</Text>
+									// </View>
+								)}
+							/>
+							</View>
+					</Tab>
 
-						<View key="1" style={styles.view}>
-							<SectionList
-									showsVerticalScrollIndicator={false}
-									showsHorizontalScrollIndicator={false}
-									sections={recipe.ingredients}
-									keyExtractor={(item, index) => item + index}
-									renderItem={({item}) => (
-										<Text style={{fontSize:16,marginBottom:8}}>{item}</Text>)
-									}
-									renderSectionHeader={({ section: { section } }) => (
-										// <View style={{borderBottomWidth:1}}>
-											<Text style={{fontSize:20, marginBottom:8}}>{section}</Text>
-										// </View>
-									)}
-								/>
-						</View>
-
-					<View key="2" style={styles.view}>
-					<SectionList
+					<Tab style={{backgroundColor: "#f0c8c8",marginVertical:12,marginHorizontal:16, paddingHorizontal:4, textWrap:'wrap'}}>
+						<SectionList
 								showsVerticalScrollIndicator={false}
 								showsHorizontalScrollIndicator={false}
 								sections={recipe.steps}
 								keyExtractor={(item, index) => item + index}
-								renderItem={({item, index, section}) => (
-
-									<>
-										<Text style={{fontSize:15,marginBottom:8}}>{item}</Text>
-										{section.time && section.data.length - 1 == index && (
-											<View style={styles.alertButton}>
-												<TouchableOpacity>
-													<Text style={styles.btnActive}>Hälytä minulle {section.time} min</Text>
-												</TouchableOpacity>
-											</View>
-										)}
-									</>
-
-								)}
+								renderItem={({item}) => (<Text>{item}</Text>)}
 								renderSectionHeader={({ section: { section } }) => (
 									// <View style={{borderBottomWidth:1}}>
-										<Text style={{fontSize:20, marginBottom:8, borderBottomWidth:1}}>{section}</Text>
-									//  </View>
+										<Text style={{fontSize:20}}>{section}</Text>
+									// </View>
 								)}
 							/>
-					</View>
-				</PagerView>
+					</Tab>
+
+				</TabView>
 			</View>
 		</View>
 	);
@@ -97,24 +92,18 @@ const styles = StyleSheet.create({
 		marginLeft:16,
 		marginRight:16,
 		paddingTop:60,
+		// marginVertical:16,
 	},
 	fill: {
 		 flex:1,
 		 backgroundColor:"#fff"
-	},
-	view: {
-		padding:16,
-	},
-	alertButton: {
-		marginTop:8,
-		marginBottom:8,
-		alignItems:'center',
 	},
 
 	buttonsContainer: {
 		marginTop:4,
 		flexDirection:'row',
 		justifyContent:'space-evenly',
+		backgroundColor:"#ccc" // DEBUG
 	},
 	btnActive: {
 		fontSize:16,
