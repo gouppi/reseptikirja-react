@@ -71,7 +71,7 @@ export default function Recipe({route,navigation}) {
 										{section.time && section.data.length - 1 == index && (
 											<View style={styles.alertButton}>
 												<TouchableOpacity>
-													<Text style={styles.btnActive}>Hälytä minulle {section.time} min</Text>
+													<Text style={styles.btnActive}>Hälytä minulle {section.time} min kuluttua</Text>
 												</TouchableOpacity>
 											</View>
 										)}
