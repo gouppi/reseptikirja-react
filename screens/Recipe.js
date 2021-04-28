@@ -10,6 +10,8 @@ export default function Recipe({route,navigation}) {
 	const ref = useRef();
 	const setPage = useCallback((page) => ref.current?.setPage(page), [true]);
 
+
+
 	return (
 		<View style={styles.recipe}>
 			<Image
@@ -18,75 +20,75 @@ export default function Recipe({route,navigation}) {
 				/>
 
 			<View style={styles.fill}>
-				<View style={styles.recipeContent}>
-					<Text style={styles.recipeTitle}>{recipe.title}</Text>
-					<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
-				</View>
-				<View style={styles.buttonsContainer}>
-					<TouchableOpacity onPress={() => {setCurrentTab(0); setPage(0);}}>
-						<Text style={currentTab == 0 ? styles.btnActive : styles.btnNotActive}>Ainesosat</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity onPress={() => {setCurrentTab(1); setPage(1); } }>
-						<Text style={currentTab == 1 ? styles.btnActive : styles.btnNotActive}>Resepti</Text>
-					</TouchableOpacity>
-				</View>
-
-				<PagerView
-					ref={ref}
-					style={{flex:1}}
-					onPageScroll={(e) => {
-							setCurrentTab(e.nativeEvent.position);
-					}}
-					initialPage={currentTab}
-					>
-
-						<View key="1" style={styles.view}>
-							<SectionList
-									showsVerticalScrollIndicator={false}
-									showsHorizontalScrollIndicator={false}
-									sections={recipe.ingredients}
-									keyExtractor={(item, index) => item + index}
-									renderItem={({item}) => (
-										<Text style={{fontSize:16,marginBottom:8}}>{item}</Text>)
-									}
-									renderSectionHeader={({ section: { section } }) => (
-										// <View style={{borderBottomWidth:1}}>
-											<Text style={{fontSize:20, marginBottom:8}}>{section}</Text>
-										// </View>
-									)}
-								/>
-						</View>
-
-					<View key="2" style={styles.view}>
-					<SectionList
-								showsVerticalScrollIndicator={false}
-								showsHorizontalScrollIndicator={false}
-								sections={recipe.steps}
-								keyExtractor={(item, index) => item + index}
-								renderItem={({item, index, section}) => (
-
-									<>
-										<Text style={{fontSize:15,marginBottom:8}}>{item}</Text>
-										{section.time && section.data.length - 1 == index && (
-											<View style={styles.alertButton}>
-												<TouchableOpacity>
-													<Text style={styles.btnActive}>Hälytä minulle {section.time} min kuluttua</Text>
-												</TouchableOpacity>
-											</View>
-										)}
-									</>
-
-								)}
-								renderSectionHeader={({ section: { section } }) => (
-									// <View style={{borderBottomWidth:1}}>
-										<Text style={{fontSize:20, marginBottom:8, borderBottomWidth:1}}>{section}</Text>
-									//  </View>
-								)}
-							/>
-					</View>
-				</PagerView>
+			<View style={styles.recipeContent}>
+				<Text style={styles.recipeTitle}>{recipe.title}</Text>
+				<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
 			</View>
+			<View style={styles.buttonsContainer}>
+				<TouchableOpacity onPress={() => {setCurrentTab(0); setPage(0);}}>
+					<Text style={currentTab == 0 ? styles.btnActive : styles.btnNotActive}>Ainesosat</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity onPress={() => {setCurrentTab(1); setPage(1); } }>
+					<Text style={currentTab == 1 ? styles.btnActive : styles.btnNotActive}>Resepti</Text>
+				</TouchableOpacity>
+			</View>
+
+			<PagerView
+				ref={ref}
+				style={{flex:1}}
+				onPageScroll={(e) => {
+						setCurrentTab(e.nativeEvent.position);
+				}}
+				initialPage={currentTab}
+				>
+
+				<View key="1" style={styles.view}>
+					<SectionList
+							showsVerticalScrollIndicator={false}
+							showsHorizontalScrollIndicator={false}
+							sections={recipe.ingredients}
+							keyExtractor={(item, index) => item + index}
+							renderItem={({item}) => (
+								<Text style={{fontSize:16,marginBottom:8}}>{item.amount +  " " + item.unit + " " +  item.ingredient}</Text>)
+							}
+							renderSectionHeader={({ section: { section } }) => (
+								// <View style={{borderBottomWidth:1}}>
+									<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
+								// </View>
+							)}
+						/>
+				</View>
+
+				<View key="2" style={styles.view}>
+				<SectionList
+							showsVerticalScrollIndicator={false}
+							showsHorizontalScrollIndicator={false}
+							sections={recipe.steps}
+							keyExtractor={(item, index) => item + index}
+							renderItem={({item, index, section}) => (
+
+								<>
+									<Text style={{fontSize:15,marginBottom:8}}>{item}</Text>
+									{section.time && section.data.length - 1 == index && (
+										<View style={styles.alertButton}>
+											<TouchableOpacity>
+												<Text style={styles.btnActive}>Hälytä minulle {section.time} min kuluttua</Text>
+											</TouchableOpacity>
+										</View>
+									)}
+								</>
+
+							)}
+							renderSectionHeader={({ section: { section } }) => (
+								// <View style={{borderBottomWidth:1}}>
+									<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
+								//  </View>
+							)}
+						/>
+				</View>
+			</PagerView>
+		</View>
 		</View>
 	);
 }

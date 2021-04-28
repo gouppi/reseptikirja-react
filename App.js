@@ -78,6 +78,7 @@ const NavigationSection = () => (
 				activeTintColor: '#8BCF89',
 				inactiveTintColor:'gray',
 
+
 			}}
 			>
 			<Tab.Screen name="Reseptit" component={CardsWrapper} />

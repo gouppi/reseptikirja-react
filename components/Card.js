@@ -22,7 +22,15 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 15,
 		width: "100%",
 		height: "auto",
-		marginBottom:20
+		marginBottom:20,
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 2,
+		},
+		shadowOpacity: 0.23,
+		shadowRadius: 12.62,
+		elevation: 4,
 	},
 
 	cardImage: {
@@ -32,6 +40,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: 150,
 		maxHeight: 150,
+
 
 	},
 	text: {
