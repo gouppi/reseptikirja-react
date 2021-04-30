@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-
+// import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS
 
 import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs!
 
@@ -13,7 +13,7 @@ import AnimatedSplash from "react-native-animated-splash-screen";
 import RecipeScreen from './screens/Recipe';
 import HomeScreen from './screens/Home';
 import CardsScreen from './screens/Cards';
-import SettingsScreen from './screens/Settings';
+import PantryScreen from './screens/Pantry';
 
 const ThemeContext = React.createContext('light');
 
@@ -67,7 +67,7 @@ const NavigationSection = () => (
 					let iconName;
 					if (route.name == 'Reseptit') {
 						iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline'
-					} else if (route.name == 'Asetukset') {
+					} else if (route.name == 'Ainesosat') {
 						iconName = focused ? 'ios-list' : 'ios-list-outline';
 					}
 					// You can return any component that you like here!
@@ -83,7 +83,7 @@ const NavigationSection = () => (
 			>
 			<Tab.Screen name="Reseptit" component={CardsWrapper} />
 			{/* <Tab.Screen name="Recipe" component={RecipeScreen} /> */}
-			<Tab.Screen name="Asetukset" component={SettingsScreen} />
+			<Tab.Screen name="Ainesosat" component={PantryScreen} />
 		</Tab.Navigator>
 			{/* <Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}}/> */}
 	</NavigationContainer>

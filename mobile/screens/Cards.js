@@ -16,8 +16,6 @@ export default function Cards({ navigation }) {
 
 	return (
 		<View style={styles.cardsContainer}>
-
-
 			<FlatList
 				ListHeaderComponent={
 				<>
@@ -31,6 +29,7 @@ export default function Cards({ navigation }) {
 				</>}
 				style={styles.flatList}
 				data={DATA}
+				keyExtractor={d => "recipe_" + d.id}
 				renderItem={(d) => (
 					<TouchableWithoutFeedback
 						onPress={() =>
@@ -55,9 +54,7 @@ const styles = StyleSheet.create({
 		paddingLeft: 15,
 		paddingRight: 15,
 		flex: 1,
-		// flexDirection: 'column',
 		backgroundColor: "#F6F6F6",
-		// alignItems: 'center',
 		justifyContent: "center",
 	},
 	textAndInput: {

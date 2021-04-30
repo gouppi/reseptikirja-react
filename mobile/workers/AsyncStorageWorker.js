@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
+	export const PANTRY_KEY = "@PANTRY_INGREDIENTS";
+
 // export default const AsyncStorageWorker = () => {
 
 	/**
@@ -36,4 +39,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 		}
 	}
 // }
+
+
 
