@@ -9,7 +9,7 @@ let APIKit = axios.create({
 	timeout: 1000
 });
 
-export async function fetchRecipes (search_term: string, ingredients?: Array<string>) {
+export async function fetchRecipes(search_term: string, ingredients?: Array<string>) {
 	try {
 		const result = await APIKit.post(RECIPES_ENDPOINT, {
 			search_term: search_term,

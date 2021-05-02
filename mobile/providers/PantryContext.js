@@ -32,6 +32,7 @@ const PantryContextProvider = ({ children }) => {
 		getFromStorage();
 	}, []);
 
+
 	/** 
 	* 	This useEffect listens for changes happening to ingredients list
 	* 	and updates the change to device storage (through asyncStorageWorker) 
