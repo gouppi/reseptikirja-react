@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, Text, View, SafeAreaView, Button, FlatList, Image,ScrollView } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { fetchIngredient } from "../workers/APIWorker";
 import Modal from "react-native-modal";
 import { PANTRY_KEY, getData, setData } from "../workers/AsyncStorageWorker";
 
+import {usePantryContext} from '../providers/PantryContext';
+
 import Ingredient from './../components/Ingredient';
 import StyledButton from "./../components/StyledButton";
 import Chip from '../components/Chip';
 
 export default function Pantry() {
-  const [ingredientsList, setIngredientsList] = useState([]);
+//   const [ingredientsList, setIngredientsList] = useState([]);
   const [scanningMode, setScanningMode] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [scannedEANData, setScannedEANData] = useState(null);
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const {ingredients, setIngredients} = usePantryContext();
 
   /** */
   const toggleModal = () => {
@@ -26,7 +30,7 @@ export default function Pantry() {
 	  console.log("HAS LIST THIS INGREDIENT");
 	  console.log("NEW INGREDIENT HERE");
 	  console.log(new_ingredient);
-	  return ingredientsList.some(i => i.ean === new_ingredient?.ean);
+	  return ingredients.some(i => i.ean === new_ingredient?.ean);
   }
 
   const showModalInfoForData = (data) => {
@@ -37,25 +41,25 @@ export default function Pantry() {
   }
 
   /* This fetches the up-to-date list of ingredients from async storage when user navigates to pantry page */
-  useEffect(() => {
-	(async () => {
-	  console.log("Fetching from async storage");
-	  try {
-		let ingredientsFromASyncStorage = await getData(PANTRY_KEY);
-		if (
-		  null !== ingredientsFromASyncStorage &&
-		  ingredientsFromASyncStorage.length
-		) {
-		  console.log(
-			"Fetched data from async storage, found stuff from there!"
-		  );
-		  setIngredientsList(JSON.parse(ingredientsFromASyncStorage));
-		}
-	  } catch (err) {
-		console.log("useEffect error", err);
-	  }
-	})();
-  }, []);
+//   useEffect(() => {
+// 	(async () => {
+// 	  console.log("Fetching from async storage");
+// 	  try {
+// 		let ingredientsFromASyncStorage = await getData(PANTRY_KEY);
+// 		if (
+// 		  null !== ingredientsFromASyncStorage &&
+// 		  ingredientsFromASyncStorage.length
+// 		) {
+// 		  console.log(
+// 			"Fetched data from async storage, found stuff from there!"
+// 		  );
+// 		  setIngredients(JSON.parse(ingredientsFromASyncStorage));
+// 		}
+// 	  } catch (err) {
+// 		console.log("useEffect error", err);
+// 	  }
+// 	})();
+//   }, []);
 
   /* This validates camera permissions */
   const validatePermissions = () => {
@@ -68,18 +72,18 @@ export default function Pantry() {
   /** Adds the scanned item to device storage. And closes the modal */
   const addItemToDeviceStorage = (ingredient) => {
 	// console.log("User wants to put this to device storage", ingredient);
-	let iL = ingredientsList;
+	let iL = ingredients;
 	iL.push(ingredient); // proper way to leave state variables immutable this way i guess.
-	setIngredientsList(iL);
+	setIngredients(iL);
 	setData(PANTRY_KEY, JSON.stringify(iL));
 	toggleModal();
   };
 
   const removeItemFromDeviceStorage = (ingredient) => {
 	// console.log("User wants to remove this from device storage", ingredient);
-	let iL = ingredientsList;
+	let iL = ingredients;
 	iL = iL.filter(i => i.ean !== ingredient.ean);
-	setIngredientsList(iL);
+	setIngredients(iL);
 	setData(PANTRY_KEY, JSON.stringify(iL));
 	toggleModal();
   };
@@ -108,10 +112,10 @@ export default function Pantry() {
 		<>
 		<View style={{height:"90%",width:"100%", marginBottom:10}}>
 		  <Text style={styles.pantryText}>Ruokakomero</Text>
-		  {ingredientsList.length > 0 ? (
+		  {ingredients.length > 0 ? (
 			<FlatList 
 				style={{width:"100%", paddingHorizontal:10}}
-				data={ingredientsList}
+				data={ingredients}
 				keyExtractor={item => 'ingredient_' + item.ean}
 				renderItem={({item,index}) => <Ingredient key={index} item={item} onClick={showModalInfoForData}/>}/>
 		  ) 

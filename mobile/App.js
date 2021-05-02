@@ -1,8 +1,10 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect,useContext} from 'react';
 import 'react-native-gesture-handler';
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+
 // import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS
 
 import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs!
@@ -15,17 +17,21 @@ import HomeScreen from './screens/Home';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
 
-const ThemeContext = React.createContext('light');
+import {usePantryContext, PantryContextProvider} from './providers/PantryContext';
+
+// const ThemeContext = React.createContext('light');
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
+	// const ctx = usePantryContext();
+	
 	const [loaded, setLoaded] = useState(false);
 	useEffect(() => {
 		setTimeout(() => {
 			setLoaded(true);
-		}, 3000);
+		}, 2000);
 	}, []);
 
 	// useEffect(() => {
@@ -33,15 +39,17 @@ export default function App() {
 	// }, []);
 
 	return (
-		<AnimatedSplash
-			translucent={true}
-			isLoaded={loaded}
-			logoImage={require("./assets/book2.png")}
-			backgroundColor={"#8BCF89"}
-			logoHeight={200}
-			logoWidth={200}>
-			{NavigationSection()}
-		</AnimatedSplash>
+		<PantryContextProvider>
+			<AnimatedSplash
+				translucent={true}
+				isLoaded={loaded}
+				logoImage={require("./assets/book2.png")}
+				backgroundColor={"#8BCF89"}
+				logoHeight={200}
+				logoWidth={200}>
+				{NavigationSection()}
+			</AnimatedSplash>
+		</PantryContextProvider>
 	);
 }
 
@@ -77,8 +85,6 @@ const NavigationSection = () => (
 			tabBarOptions={{
 				activeTintColor: '#8BCF89',
 				inactiveTintColor:'gray',
-
-
 			}}
 			>
 			<Tab.Screen name="Reseptit" component={CardsWrapper} />
