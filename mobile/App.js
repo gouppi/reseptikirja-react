@@ -25,44 +25,45 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
-	// const ctx = usePantryContext();
-	
-	const [loaded, setLoaded] = useState(false);
-	useEffect(() => {
-		setTimeout(() => {
-			setLoaded(true);
-		}, 2000);
-	}, []);
-
-	// useEffect(() => {
-	// 	ImmersiveMode.fullLayout(true);
-	// }, []);
-
 	return (
 		<PantryContextProvider>
-			<AnimatedSplash
-				translucent={true}
-				isLoaded={loaded}
-				logoImage={require("./assets/book2.png")}
-				backgroundColor={"#8BCF89"}
-				logoHeight={200}
-				logoWidth={200}>
-				{NavigationSection()}
-			</AnimatedSplash>
+			<Wrapper/>
 		</PantryContextProvider>
 	);
 }
 
-const CardsWrapper = () => {
+/**
+ * Wrapper component is used only because we need App component to initialize context before.
+ */
+
+const Wrapper = () => {
+	const {fetchRecipes} = usePantryContext();
+	const [loaded, setLoaded] = useState(false);
+	
+	/**
+	 * This useEffect handles pre-fetching initial set of recipes from the API, and only after the request is completed
+	 * (or the request has taken too long) - will the Splash screen hide.
+	 * TODO: Add an additional spinner icon to the splash screen, show it once the request takes more than 2 seconds.
+	 * TODO: Add a toast (messagebox) showing a request failure, if we're unable to perform API request ATM.
+	 */
+	useEffect(() => {
+		(async() => {
+			console.log("Running App useEffect function, calling fetchRecipes @ pantryContext");
+			let response = await fetchRecipes();
+			setLoaded(true);
+		})();
+	}, []);
+
 	return (
-		<Stack.Navigator
-			screenOptions={{headerShown: false}}>
-			<Stack.Screen
-				name="Home"
-				component={CardsScreen}
-				/>
-			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
-		</Stack.Navigator>
+		<AnimatedSplash
+			translucent={true}
+			isLoaded={loaded}
+			logoImage={require("./assets/book2.png")}
+			backgroundColor={"#8BCF89"}
+			logoHeight={200}
+			logoWidth={200}>
+			{NavigationSection()}
+		</AnimatedSplash>
 	)
 }
 
@@ -91,6 +92,19 @@ const NavigationSection = () => (
 			{/* <Tab.Screen name="Recipe" component={RecipeScreen} /> */}
 			<Tab.Screen name="Ainesosat" component={PantryScreen} />
 		</Tab.Navigator>
-			{/* <Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}}/> */}
 	</NavigationContainer>
 );
+
+
+const CardsWrapper = () => {
+	return (
+		<Stack.Navigator
+			screenOptions={{headerShown: false}}>
+			<Stack.Screen
+				name="Home"
+				component={CardsScreen}
+				/>
+			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
+		</Stack.Navigator>
+	)
+}

@@ -1,11 +1,29 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
 import { getData, setData, PANTRY_KEY, PANTRY_KEYWORDS_KEY } from "../workers/AsyncStorageWorker";
+import {fetchRecipes as fetchRecipesAPIWorker} from '../workers/APIWorker';
+
 
 const PantryContext = createContext({});
 const usePantryContext = () => useContext(PantryContext);
 const PantryContextProvider = ({ children }) => {
 	const [ingredients, setIngredients] = useState([]);
 	const [keywords, setKeywords] = useState([]);
+	const [recipes, setRecipes] = useState([]);
+
+	/**
+	 * 
+	 */
+	const fetchRecipes = async (query) => {
+		let response;
+		try {
+			response = await fetchRecipesAPIWorker(query, keywords);
+			console.log("Got response from server.js!");
+			setRecipes(response);
+		} catch(err) {
+			console.log(err);
+		}
+	}
+
 
 	/** 
 	*	This useEffect fetches the initial dataset from device
@@ -70,7 +88,7 @@ const PantryContextProvider = ({ children }) => {
 	}
 
 	return (
-		<PantryContext.Provider value={{ ingredients, setIngredients, keywords }}>
+		<PantryContext.Provider value={{ ingredients, setIngredients, keywords,fetchRecipes, recipes }}>
 			{children}
 		</PantryContext.Provider>
 	);

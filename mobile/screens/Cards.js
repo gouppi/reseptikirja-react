@@ -9,10 +9,24 @@ import {
 	ScollView
 } from "react-native";
 import Card from "../components/Card";
-import DATA from '../dummydata';
+import {usePantryContext} from '../providers/PantryContext';
 
+let x;
 export default function Cards({ navigation }) {
-	const [text, onChangeText] = useState("");
+	const {ingredients,recipes, fetchRecipes} = usePantryContext();
+	const [searchParam, updateSearchParam] = useState("");
+	const [isQuerying, setIsQuerying] = useState(false);
+
+	const changeSearchText = (text) => {
+		updateSearchParam(text);
+		clearTimeout(x);
+		x = setTimeout( async () => {
+			if (isQuerying) return; // don't allow DoS, wait for first query to return. TODO: CANCEL INITIAL REQUESTS.
+			setIsQuerying(true);
+			let data = await fetchRecipes(text);
+			setIsQuerying(false);
+		}, 1000);
+	}
 
 	return (
 		<View style={styles.cardsContainer}>
@@ -23,12 +37,12 @@ export default function Cards({ navigation }) {
 					<TextInput
 						style={styles.input}
 						placeholder="Millaista reseptiä etsit tänään?"
-						onChangeText={onChangeText}
-						value={text}
+						onChangeText={changeSearchText}
+						value={searchParam}
 					/>
 				</>}
 				style={styles.flatList}
-				data={DATA}
+				data={recipes}
 				keyExtractor={d => "recipe_" + d.id}
 				renderItem={(d) => (
 					<TouchableWithoutFeedback

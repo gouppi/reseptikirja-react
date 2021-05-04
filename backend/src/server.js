@@ -2,50 +2,136 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const AWS = require("aws-sdk");
 
-let myCredentials = new AWS.CognitoIdentityCredentials({
+/** MONGO DB CONFIG */
+const MongoClient = require('mongodb').MongoClient;
+const MONGO_USER = "lounaskartta";
+const MONGO_PASS = 'wuMhSVFYwFYxT6Y4';
+const MONGO_DB = 'reseptikirja';
+const MONGO_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@cluster0.zhemz.gcp.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`;
+let mongoClient;
+// END OF MONGO
+
+
+/**
+ *	START OF AWS CREDENTIALS
+ */
+const myCredentials = new AWS.CognitoIdentityCredentials({
 	IdentityPoolId: "eu-north-1:e7d063e2-a5bf-46a8-8ae6-ff7e29b1bb0b",
 });
-let myConfig = new AWS.Config({
+const myConfig = new AWS.Config({
 	credentials: myCredentials,
 	region: "eu-north-1",
 });
-
-// AWS CONFIGURATIONS HERE //
 AWS.config.update(myConfig);
 const DYNAMODB = new AWS.DynamoDB.DocumentClient();
 const S3_BUCKET_NAME = "softanautti-react-recipe-book";
-const S3BUCKET = new AWS.S3({
-	params: { Bucket: S3_BUCKET_NAME },
-	apiVersion: "2006-03-01",
-});
+const S3BUCKET = new AWS.S3({params: {Bucket: S3_BUCKET_NAME}});
 
-// END OF AWS CONFIGURATIONS //
+// END OF AWS
 
 const app = express();
 app.use(bodyParser.json());
 
-/** ENDPOINT FOR SEARCHING RECIPES */
-app.post("/recipes", function (req, res) {
-	console.log(req.body);
-	res.send(RECIPES);
+
+/**
+ * Endpoint for handling recipes fetch.
+ * TODO: Add sort parameter, allow MongoDB to handle sorting since it plays it out nicely.
+ * @method POST 
+ * @params req.body.search_term {string} User-based text from input field "Mitä reseptiä etsit?"
+ * @params req.body.keywords {array<string>} Ingredients-based unique array of keywords.
+ * @return {array<object>} Array of Recipe objects.  
+ **/
+app.post("/recipes", async function (req, res) {
+	console.log("Got request to /recipes!");
+	let {search_term, keywords} = req.body;
+	console.log("Backend:: Search_term: ", search_term, "Keywords:", keywords?.join(','));
+	
+	// TODO: Remove useless data for search page. We dont need steps or ingredients, only builds up data size here.
+	// TODO: Can't continue on this since it would require to implement another API query on recipe page. KISS for now. 
+
+	let aggregations = [
+		{$project: {
+			"_id": 0,
+			// "id": 1,
+			// "ingredients": 0,
+			// "steps": 0
+		}}
+	];
+
+	// If user provides search term and its length is greater than 2 characters, perform title search.
+	if (search_term && search_term.length > 2) {
+		// TODO: search_term sanitation
+		let search_term_regex = ".?" + search_term + ".?";
+		aggregations.push({ "$match": {'title': {$regex: search_term_regex, $options: 'i' }}});
+	}
+
+	if (keywords && Array.isArray(keywords)) {
+		// TODO: keywords sanitation
+		let keywords_aggregation = {
+		"$addFields": {
+			"Matches": {
+				"$trunc": {
+					"$multiply": [
+					{ "$divide": [
+						{ "$size": {
+							"$setIntersection": [ "$all_ingredients", keywords ] 
+						}}, 
+						{ "$size": "$all_ingredients" }
+					]},
+					100
+					]
+				}
+			}
+		}};
+		aggregations.push(keywords_aggregation);
+		aggregations.push({ "$sort" : { "Matches" : -1 } }); // TODO if sorting by matches, add this.	
+	}
+
+	aggregations.push( { $limit : 10 });
+	aggregations.push( { $skip: 0});
+	
+	// TODO: limit & size & offset handling as well here. We might not have keywords, we might not have search term.
+	// TODO: pagination 
+	
+	let result = {};
+	let client = await getClient();
+	const db = await client.db(MONGO_DB);
+    try {
+		let collection = await db.collection("recipes").aggregate(aggregations).toArray((err, results) => {
+			// console.log(err,results);
+			console.log("ERRORS", err);
+			console.log("RESULTS length:", results.length);
+			res.json(results);
+		});
+        
+	} catch (err) {
+		console.log(err);
+		res.json(result);
+	}
 });
 
-/** ENDPOINT FOR SEARCHING BY USING EAN CODES. */
+
+/** 
+ * ENDPOINT FOR SEARCHING BY USING EAN CODES.
+ *
+ */
 app.get("/ingredients/:ean", async function (req, res) {
-	const EAN = req.params.ean.replace(/\D/g, '').slice(0,13); // Sanitize to 13 char
+	const EAN = req.params.ean.replace(/\D/g, "").slice(0, 13); // Sanitize to 13 char
 	console.log("RAW: ", req.params.ean, "SANITIZED: ", EAN);
 	let result = {};
 	try {
 		let response = await DYNAMODB.get({
-			TableName: 'ingredients',
+			TableName: "ingredients",
 			Key: {
-				ean: EAN
-			}
+				ean: EAN,
+			},
 		}).promise();
-		result = response.hasOwnProperty('Item') ? response.Item : response;
-
+		result = response.hasOwnProperty("Item") ? response.Item : response;
 	} catch (err) {
-		console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+		console.error(
+			"Unable to read item. Error JSON:",
+			JSON.stringify(err, null, 2)
+		);
 	}
 	res.json(result);
 });
@@ -54,126 +140,26 @@ app.get("/ingredients/:ean", async function (req, res) {
 /** TODO: ENDPOINT FOR FETCHING S3 STORED IMAGES */
 app.get("/image/:ean", function (req, res) {});
 
-app.listen(3434);
-console.log("Express is listening on on port 3434");
 
-// const RECIPES = [
-// 	{
-// 		id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-// 		title: "Mokkapalat",
-// 		img:
-// 			"https://cdn.valio.fi/mediafiles/54f7efd9-18cc-4cb4-83f7-e1b3f41cb231/1000x752-recipe-hero/4x3/mokkapalat.jpg",
-// 		time: 45,
-// 		ingredients: [
-// 			{
-// 				section: "Pohja",
-// 				data: [
-// 					{
-// 						ingredient: "Vehnäjauho",
-// 						amount: "5",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Kananmuna",
-// 						amount: "4",
-// 						unit: "kpl",
-// 					},
-// 					{
-// 						ingredient: "Maito",
-// 						amount: "2",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Sokeri",
-// 						amount: "2.5",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Voi",
-// 						amount: "200",
-// 						unit: "g",
-// 					},
-// 					{
-// 						ingredient: "Kaakaojauhe",
-// 						amount: "0.5",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Leivinjauhe",
-// 						amount: "1",
-// 						unit: "rkl",
-// 					},
-// 					{
-// 						ingredient: "Vaniljasokeri",
-// 						amount: "1",
-// 						unit: "rkl",
-// 					},
-// 				],
-// 			},
-// 			{
-// 				section: "Kuorrutus",
-// 				data: [
-// 					{
-// 						ingredient: "Voi",
-// 						amount: "75",
-// 						unit: "g",
-// 					},
-// 					{
-// 						ingredient: "Kahvi",
-// 						amount: "1",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Tomusokeri",
-// 						amount: "4",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Kaakaojauhe",
-// 						amount: "0.5",
-// 						unit: "dl",
-// 					},
-// 					{
-// 						ingredient: "Vaniljasokeri",
-// 						amount: "2",
-// 						unit: "tl",
-// 					},
-// 				],
-// 			},
-// 			{
-// 				section: "Pinnalle",
-// 				data: [
-// 					{
-// 						ingredient: "Nonparelli",
-// 						amount: "",
-// 						unit: "",
-// 					},
-// 				],
-// 			},
-// 		],
-// 		steps: [
-// 			{
-// 				section: "Pohja",
-// 				data: [
-// 					"Vatkaa huoneenlämpöiset munat ja sokeri paksuksi, vaaleaksi vaahdoksi.",
-// 					"Sulata voi kattilassa tai mikrossa. Lisää voisulaan kylmä maito, niin se jäähtyy sopivaksi.",
-// 					"Yhdistä kuivat aineet.",
-// 					"Sekoita muna-sokerivaahtoon voi-maitoseos sekä kuivat aineet sihdin läpi. Sekoita varovasti nuolijalla tasaiseksi.",
-// 					"Kaada leivinpaperille uunipannulle n. 30 - 40 cm.",
-// 					"Kypsennä uunin keskiosassa 200 asteessa n. 15 min. Anna jäähtyä ennen kuorruttamista.",
-// 				],
-// 				time: 15,
-// 			},
-// 			{
-// 				section: "Kuorrutus",
-// 				data: [
-// 					"Sulata voi kattilassa.",
-// 					"Lisää kahvi. Sihtaa muut aineet siivilän läpi. Sekoita, kunnes tasaista.",
-// 					"Kaada hieman lämmin kuorrutus pohjan keskelle. (Kuumana kuorrute on liian löysää levitettäväksi ja silloin se imeytyy pohjaan. Kuorrutteen jäähtyessä, se paksuuntuu sopivaksi.) Anna valua reunoja kohti.",
-// 					"Levitä tarvittaessa lastalla reunoille.",
-// 					"Koristele nonparelleilla ennen kuin kuorrutus kovettuu. Leikkaa 24 - 30 palaa.",
-// 				],
-// 			},
-// 		],
-// 	},
-// ];
+/**
+ * Creates a solid connection to mongodb pool.
+ */
+const getClient = async () => {
+    if (!mongoClient) {
+        mongoClient = await MongoClient.connect(MONGO_URI, { poolSize: 10, useNewUrlParser: true, useUnifiedTopology: true })
+            .catch(err => { console.log(err); return getClient(); });
+		console.log("MongoDB Connection ready!");
+    }
+    return mongoClient;
+}
+
+
+/**
+ * Asyncronous initialization of the express server.
+ * First, mongodb connection is established, and after that, server is enabled.
+ */
+(async() =>{
+	await getClient();
+	app.listen(3434);
+	console.log("Express is listening on on port 3434");
+})();
