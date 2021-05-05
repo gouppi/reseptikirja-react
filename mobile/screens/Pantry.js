@@ -116,11 +116,13 @@ export default function Pantry() {
 				<>
 					<View
 						style={{
+							marginTop:10,
+							paddingTop:15,
 							height: "90%",
 							width: "100%",
 							marginBottom: 10,
 						}}>
-						<Text style={styles.pantryText}>Ruokakomero</Text>
+						<Text style={styles.pantryText}>Ruokakomerosi</Text>
 						{ingredients.length > 0 ? (
 							<FlatList
 								style={{width: "100%", paddingHorizontal: 10}}
@@ -182,15 +184,9 @@ export default function Pantry() {
 	);
 }
 
-function ModalContainer({
-	heading,
-	eanData,
-	hasListThisIngredient,
-	addItemToDeviceStorage,
-	removeItemFromDeviceStorage,
-	isModalVisible,
-	toggleModal,
-}) {
+function ModalContainer(props) {
+	let {heading,eanData,hasListThisIngredient,addItemToDeviceStorage,removeItemFromDeviceStorage,isModalVisible,toggleModal} = props;
+
 	return (
 		<Modal animationType="fade" isVisible={isModalVisible}>
 			<SafeAreaView style={{backgroundColor: "#fff"}}>

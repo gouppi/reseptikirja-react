@@ -30,6 +30,31 @@ export async function fetchRecipes(search_term?: string, keywords?: Array<string
 }
 
 
+/**
+ * Creates a POST request to backend server, providing single recipe ID as well as user current keywords.
+ * Backend fetches full data for the recipe and marks found keywords directly on the backend side, the task isn't done
+ * on the client side.
+ * @param recipe_id {string} unique identifier for recipe
+ * @param keywords {array<string>}
+ */
+
+export async function fetchSingleRecipe(recipe_id: string, keywords?: Array<string>) {
+	console.log("Fetch Single Recipe triggered with following data");
+	console.log("REcipe id", recipe_id);
+	console.log("Keywords: ", keywords?.join(','));
+	try {
+		const result = await APIKit.post(RECIPES_ENDPOINT + '/' + recipe_id, {
+			keywords: keywords
+		});
+		return result.data;
+	} catch (error) {
+		console.log("FETCH SINGLE RECIPE ERROR:");
+		console.log(error);
+	}
+	return false;
+}
+
+
 export async function fetchIngredient(ean: string) {
 	try {
 		const result = await APIKit.get(INGREDIENT_ENDPOINT + '/' + ean);
@@ -43,3 +68,4 @@ export async function fetchIngredient(ean: string) {
 
 module.exports.fetchIngredient = fetchIngredient;
 module.exports.fetchRecipes = fetchRecipes;
+module.exports.fetchSingleRecipe = fetchSingleRecipe;

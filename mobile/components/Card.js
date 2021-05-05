@@ -6,49 +6,55 @@ export default function Card({title,img}) {
 		<View style={styles.card}>
 			<Image
 				style={styles.cardImage}
-				source={{
-					uri: img,
-				}}
+				source={{uri: img}}
 				/>
-				<Text style={styles.text}>{title}</Text>
+				<View style={styles.textContainer}>
+					<Text style={styles.title}>{title}</Text>
+					{/* <Text style={styles.text}>foo foofoo </Text> */}
+				</View>
 		</View>
 	)
 }
 
 const styles = StyleSheet.create({
 	card: {
+		backgroundColor:"#fff",
 		flex:1,
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
-		width: "100%",
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
+		borderBottomLeftRadius:10,
+		borderBottomRightRadius:10,
+		width: "98%",
 		height: "auto",
+		marginLeft: "auto",
+		marginRight: "auto",
 		marginBottom:20,
 		shadowColor: "#000",
 		shadowOffset: {
 			width: 0,
-			height: 2,
+			height: 1,
 		},
-		shadowOpacity: 0.23,
-		shadowRadius: 2.62,
-		elevation: 4,
+		shadowOpacity: 0.22,
+		shadowRadius: 2.22,
+		elevation: 3,
 	},
 
 	cardImage: {
 		flex:1,
-		borderTopLeftRadius: 15,
-		borderTopRightRadius: 15,
+		borderTopLeftRadius: 10,
+		borderTopRightRadius: 10,
 		width: "100%",
 		height: 150,
 		maxHeight: 150,
-
-
 	},
-	text: {
-		backgroundColor: "#fff",
-		height: 36,
+	textContainer: {
 		paddingLeft: 8,
-		paddingTop: 8,
-		fontSize: 14
-	}
+		paddingTop:8,
+		paddingBottom:8
+	},
 
+	title: {
+		fontSize: 16,
+		fontWeight: "400",
+	}
 });

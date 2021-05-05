@@ -34,6 +34,39 @@ app.use(bodyParser.json());
 
 
 /**
+ * Endpoint for fetching single recipe data.
+ */
+
+app.post("/recipes/:id", async function (req, res) {
+	console.log("Got request to /recipes/:id, :id equals", req.params);
+	let {keywords} = req.body;
+	console.log("Got keywords -> ", keywords);
+	const recipe_id = req.params.id;
+	
+
+	let result = {};
+	let client = await getClient();
+	const db = await client.db(MONGO_DB);
+    try {
+		let result = await db.collection("recipes").findOne({"id": recipe_id});
+		if (result == null) {
+			res.json({});
+		}
+		// TODO: go through keywords, mark which keywords user already has.
+		// Let's do this on backend side, not on client side.
+
+
+		res.json(result);
+        
+	} catch (err) {
+		console.log(err);
+		res.json(result);
+	}
+
+})
+
+
+/**
  * Endpoint for handling recipes fetch.
  * TODO: Add sort parameter, allow MongoDB to handle sorting since it plays it out nicely.
  * @method POST 
@@ -46,15 +79,12 @@ app.post("/recipes", async function (req, res) {
 	let {search_term, keywords} = req.body;
 	console.log("Backend:: Search_term: ", search_term, "Keywords:", keywords?.join(','));
 	
-	// TODO: Remove useless data for search page. We dont need steps or ingredients, only builds up data size here.
-	// TODO: Can't continue on this since it would require to implement another API query on recipe page. KISS for now. 
-
 	let aggregations = [
 		{$project: {
 			"_id": 0,
 			// "id": 1,
-			// "ingredients": 0,
-			// "steps": 0
+			"ingredients": 0,
+			"steps": 0
 		}}
 	];
 

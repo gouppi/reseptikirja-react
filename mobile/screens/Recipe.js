@@ -3,93 +3,110 @@ import PagerView from 'react-native-pager-view';
 
 import {View, Text, StyleSheet,Image,Button,SectionList,TouchableOpacity} from 'react-native';
 
+import {fetchSingleRecipe} from '../workers/APIWorker';
+import {usePantryContext} from '../providers/PantryContext';
+
 export default function Recipe({route,navigation}) {
 	const [currentTab, setCurrentTab] = useState(0);
-	const { recipe } = route.params;
-
+	const { recipe_id } = route.params;
+	const [recipe, setRecipe] = useState({});
+	const {keywords} = usePantryContext();
 	const ref = useRef();
 	const setPage = useCallback((page) => ref.current?.setPage(page), [true]);
+
+	// When user navigates to recipe page, trigger API call to fetch full recipe data. (Search page has lite data).
+	// After the fetch is complete, show the UI.
+	useEffect(() => {
+		const fetchRecipeData = async (id,kw) => {
+			let data = await fetchSingleRecipe(id,kw);
+			setRecipe(data);
+		}
+		fetchRecipeData(recipe_id, keywords);
+
+	}, []);
 
 
 
 	return (
-		<View style={styles.recipe}>
-			<Image
-				style={styles.cardImage}
-				source={{uri: recipe.img}}
-				/>
+		recipe.hasOwnProperty('title') ? ( 
+			<View style={styles.recipe}>
+				<Image
+					style={styles.cardImage}
+					source={{uri: recipe.img}}
+					/>
 
-			<View style={styles.fill}>
-			<View style={styles.recipeContent}>
-				<Text style={styles.recipeTitle}>{recipe.title}</Text>
-				<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
-			</View>
-			<View style={styles.buttonsContainer}>
-				<TouchableOpacity onPress={() => {setCurrentTab(0); setPage(0);}}>
-					<Text style={currentTab == 0 ? styles.btnActive : styles.btnNotActive}>Ainesosat</Text>
-				</TouchableOpacity>
+				<View style={styles.fill}>
+					<View style={styles.recipeContent}>
+						<Text style={styles.recipeTitle}>{recipe.title}</Text>
+						<Text style={styles.recipeTime}>Valmistusaika {recipe.time} min</Text>
+					</View>
+					<View style={styles.buttonsContainer}>
+						<TouchableOpacity onPress={() => {setCurrentTab(0); setPage(0);}}>
+							<Text style={currentTab == 0 ? styles.btnActive : styles.btnNotActive}>Ainesosat</Text>
+						</TouchableOpacity>
 
-				<TouchableOpacity onPress={() => {setCurrentTab(1); setPage(1); } }>
-					<Text style={currentTab == 1 ? styles.btnActive : styles.btnNotActive}>Resepti</Text>
-				</TouchableOpacity>
-			</View>
+						<TouchableOpacity onPress={() => {setCurrentTab(1); setPage(1); } }>
+							<Text style={currentTab == 1 ? styles.btnActive : styles.btnNotActive}>Resepti</Text>
+						</TouchableOpacity>
+					</View>
 
-			<PagerView
-				ref={ref}
-				style={{flex:1}}
-				onPageScroll={(e) => {
-						setCurrentTab(e.nativeEvent.position);
-				}}
-				initialPage={currentTab}
-				>
+					<PagerView
+						ref={ref}
+						style={{flex:1}}
+						onPageScroll={(e) => {
+								setCurrentTab(e.nativeEvent.position);
+						}}
+						initialPage={currentTab}
+						>
 
-				<View key="1" style={styles.view}>
-					<SectionList
-							showsVerticalScrollIndicator={false}
-							showsHorizontalScrollIndicator={false}
-							sections={recipe.ingredients}
-							keyExtractor={(item, index) => item + index}
-							renderItem={({item}) => (
-								<Text style={{fontSize:16,marginBottom:8}}>{item.amount +  " " + item.unit + " " +  item.ingredient}</Text>)
-							}
-							renderSectionHeader={({ section: { section } }) => (
-								// <View style={{borderBottomWidth:1}}>
-									<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
-								// </View>
-							)}
-						/>
-				</View>
-
-				<View key="2" style={styles.view}>
-				<SectionList
-							showsVerticalScrollIndicator={false}
-							showsHorizontalScrollIndicator={false}
-							sections={recipe.steps}
-							keyExtractor={(item, index) => item + index}
-							renderItem={({item, index, section}) => (
-
-								<>
-									<Text style={{fontSize:15,marginBottom:8}}>{item}</Text>
-									{section.time && section.data.length - 1 == index && (
-										<View style={styles.alertButton}>
-											<TouchableOpacity>
-												<Text style={styles.btnActive}>Hälytä minulle {section.time} min kuluttua</Text>
-											</TouchableOpacity>
-										</View>
+						<View key="1" style={styles.view}>
+							<SectionList
+									showsVerticalScrollIndicator={false}
+									showsHorizontalScrollIndicator={false}
+									sections={recipe.ingredients}
+									keyExtractor={(item, index) => item + index}
+									renderItem={({item}) => (
+										<Text style={{fontSize:16,marginBottom:8}}>{item.amount +  " " + item.unit + " " +  item.ingredient}</Text>)
+									}
+									renderSectionHeader={({ section: { section } }) => (
+										// <View style={{borderBottomWidth:1}}>
+											<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
+										// </View>
 									)}
-								</>
+								/>
+						</View>
 
-							)}
-							renderSectionHeader={({ section: { section } }) => (
-								// <View style={{borderBottomWidth:1}}>
-									<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
-								//  </View>
-							)}
-						/>
+						<View key="2" style={styles.view}>
+						<SectionList
+									showsVerticalScrollIndicator={false}
+									showsHorizontalScrollIndicator={false}
+									sections={recipe.steps}
+									keyExtractor={(item, index) => item + index}
+									renderItem={({item, index, section}) => (
+
+										<>
+											<Text style={{fontSize:15,marginBottom:8}}>{item}</Text>
+											{section.time && section.data.length - 1 == index && (
+												<View style={styles.alertButton}>
+													<TouchableOpacity>
+														<Text style={styles.btnActive}>Hälytä minulle {section.time} min kuluttua</Text>
+													</TouchableOpacity>
+												</View>
+											)}
+										</>
+
+									)}
+									renderSectionHeader={({ section: { section } }) => (
+										// <View style={{borderBottomWidth:1}}>
+											<Text style={{backgroundColor:"#fff",fontSize:20, paddingBottom:16}}>{section}</Text>
+										//  </View>
+									)}
+								/>
+						</View>
+					</PagerView>
 				</View>
-			</PagerView>
-		</View>
-		</View>
+			</View>
+		) : ( <View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>Loading</Text></View>)
 	);
 }
 

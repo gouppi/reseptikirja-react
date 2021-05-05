@@ -1,9 +1,12 @@
 import React, {useState, useEffect,useContext} from 'react';
-import 'react-native-gesture-handler';
+import 'react-native-gesture-handler';	
 
+import {StatusBar} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+
+import * as Font from 'expo-font';
 
 // import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS
 
@@ -25,6 +28,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
+
 	return (
 		<PantryContextProvider>
 			<Wrapper/>
@@ -40,6 +44,14 @@ const Wrapper = () => {
 	const {fetchRecipes} = usePantryContext();
 	const [loaded, setLoaded] = useState(false);
 	
+	// const loadFonts = async() => {
+	// 	console.log("Loading fonts");
+	// 	let result = await Font.loadAsync({
+	// 		'Quicksand-Bold': require('./assets/fonts/Quicksand-Bold.ttf')
+	// 	});
+	// 	console.log("load ASync result", result);
+	// }
+
 	/**
 	 * This useEffect handles pre-fetching initial set of recipes from the API, and only after the request is completed
 	 * (or the request has taken too long) - will the Splash screen hide.
@@ -50,11 +62,20 @@ const Wrapper = () => {
 		(async() => {
 			console.log("Running App useEffect function, calling fetchRecipes @ pantryContext");
 			let response = await fetchRecipes();
+			// let success = await loadFonts(); // TODO: debug this, loading fonts seems to be bugging somehow.
 			setLoaded(true);
 		})();
 	}, []);
 
 	return (
+		<>
+		<StatusBar
+			animated={true}
+			backgroundColor="#61dafb"
+			barStyle={"dark-content"}
+			showHideTransition={"fade"}
+			hidden={false} />
+
 		<AnimatedSplash
 			translucent={true}
 			isLoaded={loaded}
@@ -64,11 +85,13 @@ const Wrapper = () => {
 			logoWidth={200}>
 			{NavigationSection()}
 		</AnimatedSplash>
+		</>
 	)
 }
 
 
 const NavigationSection = () => (
+	
 	<NavigationContainer>
 		<Tab.Navigator
 			screenOptions={({route}) => ({
@@ -84,7 +107,13 @@ const NavigationSection = () => (
 				},
 			})}
 			tabBarOptions={{
-				activeTintColor: '#8BCF89',
+				
+				labelStyle: {
+					fontSize:14,
+					paddingBottom:4
+				},
+				
+				activeTintColor: '#4AAE47',
 				inactiveTintColor:'gray',
 			}}
 			>
@@ -93,6 +122,7 @@ const NavigationSection = () => (
 			<Tab.Screen name="Ainesosat" component={PantryScreen} />
 		</Tab.Navigator>
 	</NavigationContainer>
+	
 );
 
 

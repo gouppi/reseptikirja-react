@@ -28,15 +28,23 @@ export default function Cards({ navigation }) {
 		}, 1000);
 	}
 
+	const getGreetingByDeviceTime = () => {
+		// TODO: greeting based on date time here?
+		return "Hyvää iltapäivää!";
+	}
+
 	return (
 		<View style={styles.cardsContainer}>
 			<FlatList
+				// stickyHeaderIndices={[0]}
+				showsVerticalScrollIndicator={false}
 				ListHeaderComponent={
 				<>
-					<Text style={styles.greeting}> Moikka Janne!</Text>
+					<Text style={styles.greeting}>{getGreetingByDeviceTime()}</Text>
 					<TextInput
 						style={styles.input}
 						placeholder="Millaista reseptiä etsit tänään?"
+						placeholderTextColor={"#888"}
 						onChangeText={changeSearchText}
 						value={searchParam}
 					/>
@@ -48,7 +56,7 @@ export default function Cards({ navigation }) {
 					<TouchableWithoutFeedback
 						onPress={() =>
 							navigation.navigate("Recipe", {
-								recipe: d.item,
+								recipe_id: d.item.id,
 							})
 						}
 					>
@@ -64,6 +72,7 @@ export default function Cards({ navigation }) {
 
 const styles = StyleSheet.create({
 	cardsContainer: {
+		marginTop:10,
 		paddingTop: 40,
 		paddingLeft: 15,
 		paddingRight: 15,
@@ -78,19 +87,19 @@ const styles = StyleSheet.create({
 		width: "100%",
 		borderColor: "#c8c8c8",
 		backgroundColor: "#fff",
-		height: 40,
+		height: 44,
 		marginBottom: 20,
 		marginTop: 10,
 		paddingTop: 4,
 		paddingBottom: 4,
 		textAlign: "center",
 		borderWidth: 1,
-		borderRadius: 15,
+		borderRadius: 10,
 	},
 	greeting: {
 		textAlign: "center",
 		fontSize: 24,
-		fontWeight: "600",
+		fontWeight: "500"
 	},
 	flatList: {
 		// flex:1
