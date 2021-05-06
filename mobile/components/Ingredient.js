@@ -15,11 +15,14 @@ export default function Ingredient({item, onClick}) {
 				<Image style={styles.image} source={{uri: item.image_url}} />
 				<View style={styles.data}>
 					<Text style={styles.name}>{item.name}</Text>
-					<Text style={styles.brand}>{item.brand}</Text>
-					<Text style={styles.ean}>{item.ean}</Text>
+					{/* <Text style={styles.brand}>{item.brand}</Text> */}
+					{/* <Text style={styles.ean}>{item.ean}</Text> */}
 					<View style={styles.keywordsContainer}>
 						{item.keywords?.map((keyword, i) => (
-							<Chip key={i} text={keyword} />
+							<View style={styles.keywordBadge}>
+								<Text>{keyword}</Text>
+							</View>
+							// <Chip key={i} text={keyword} />
 						))}
 					</View>
 				</View>
@@ -33,7 +36,7 @@ const styles = StyleSheet.create({
 		// flex:1,
 		marginBottom: 8,
 		width: "100%",
-		paddingVertical: 20,
+		paddingVertical: 10,
 		display: "flex",
 		flexDirection: "row",
 		backgroundColor: "#fff",
@@ -62,9 +65,14 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 	},
 	keywordsContainer: {
-		paddingTop: 8,
+		paddingTop: 4,
 		display: "flex",
 		flexDirection: "row",
 		justifyContent: "flex-start",
 	},
+	keywordBadge: {
+		padding:3,
+		borderRadius:5,
+		backgroundColor: "#e8e8e8",
+	}
 });

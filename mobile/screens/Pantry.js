@@ -18,6 +18,8 @@ import {usePantryContext} from "../providers/PantryContext";
 
 import Ingredient from "./../components/Ingredient";
 import StyledButton from "./../components/StyledButton";
+import BetterButton from "./../components/BetterButton";
+
 import Chip from "../components/Chip";
 
 export default function Pantry({navigation}) {
@@ -27,11 +29,11 @@ export default function Pantry({navigation}) {
 	const [isModalVisible, setModalVisible] = useState(false);
 	const {ingredients, setIngredients} = usePantryContext();
 
-	React.useLayoutEffect(() => {
-		navigation.setOptions({
-			headerTitle: "Ruokakomero"
-			});
-	}, [navigation]);
+	// React.useLayoutEffect(() => {
+	// 	navigation.setOptions({
+	// 		headerTitle: "Ruokakomero"
+	// 		});
+	// }, [navigation]);
 
 	/**
 	* Switches the modal visibility state.
@@ -41,7 +43,7 @@ export default function Pantry({navigation}) {
 		setModalVisible(!isModalVisible);
 	};
 
-	/**
+	/** 
 	* Checks if the current state ingredients list contains the given ingredient or not
 	* @param {object} new_ingredient - new ingredient which the user recently scanned
 	* @return {boolean} true if new_ingredient is already in ingredients list, else false.
@@ -128,7 +130,7 @@ export default function Pantry({navigation}) {
 							width: "100%",
 							marginBottom: 10,
 						}}>
-						<Text style={styles.pantryText}>Ruokakomerosi</Text>
+						{/* <Text style={styles.pantryText}>Ruokakomerosi</Text> */}
 						{ingredients.length > 0 ? (
 							<FlatList
 								style={{width: "100%", paddingHorizontal: 10}}
@@ -161,7 +163,7 @@ export default function Pantry({navigation}) {
 						)}
 					</View>
 					<View style={{marginBottom: 20}}>
-						<StyledButton
+						<BetterButton
 							title={"Skannaa viivakoodi"}
 							onPress={async () => {
 								await validatePermissions();

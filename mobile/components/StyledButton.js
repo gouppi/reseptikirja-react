@@ -1,15 +1,15 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const StyledButton = ({title, onPress, deleteButton=false, cancelButton = false}) => {
-	return (
+const StyledButton = ({title, onPress, deleteButton=false, cancelButton = false, isVisible=true}) => {
+	return isVisible && (
 		<TouchableOpacity
         style={cancelButton ? styles.cancelButton : deleteButton ? styles.deleteButton : styles.button}
         onPress={onPress}
       >
         <Text style={cancelButton ? styles.cancelButtonText : deleteButton ? styles.deleteButtonText : styles.buttonText} >{title}</Text>
       </TouchableOpacity>
-	)
+	) ;
 }
 
 const styles = StyleSheet.create({

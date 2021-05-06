@@ -65,22 +65,22 @@ const Wrapper = () => {
 
 	return (
 		<>
-		<StatusBar
-			animated={true}
-			backgroundColor="#61dafb"
-			barStyle={"dark-content"}
-			showHideTransition={"fade"}
-			hidden={false} />
+			<StatusBar
+				animated={true}
+				backgroundColor="#61dafb"
+				barStyle={"dark-content"}
+				showHideTransition={"fade"}
+				hidden={false} />
 
-		<AnimatedSplash
-			translucent={true}
-			isLoaded={loaded}
-			logoImage={require("./assets/book2.png")}
-			backgroundColor={"#8BCF89"}
-			logoHeight={200}
-			logoWidth={200}>
-			{NavigationSection()}
-		</AnimatedSplash>
+			<AnimatedSplash
+				translucent={true}
+				isLoaded={loaded}
+				logoImage={require("./assets/book2.png")}
+				backgroundColor={"#8BCF89"}
+				logoHeight={200}
+				logoWidth={200}>
+				{NavigationSection()}
+			</AnimatedSplash>
 		</>
 	)
 }
@@ -107,6 +107,7 @@ const NavigationSection = () => (
 			})}
 			
 			tabBarOptions={{
+				
 				headerShown:true,
 				headerBackTitle:" ",
 				headerTitleAlign:"center",
@@ -119,28 +120,14 @@ const NavigationSection = () => (
 				inactiveTintColor:'gray',
 			}}
 			>
-			<Tab.Screen name="Reseptit" component={CardsWrapper}  />
-			<Tab.Screen name="Ruokakomero" component={PantryScreen} />
+			<Tab.Screen name="Reseptit" component={RecipeWrapper}  />
+			<Tab.Screen name="Ruokakomero" component={PantryWrapper} />
 		</Tab.Navigator>
 	</NavigationContainer>
 	
 );
 
-const LogoTitle = (props) => {
-	return (
-		<View style={{height:100,alignItems:"center", justifyContent:"center"}}>
-			<TextInput
-				style={{borderBottomWidth:1, borderBottomColor:"#ccc"}}
-				placeholder="Millaista reseptiä etsit tänään?"
-				placeholderTextColor={"#888"}
-				onChangeText={() => console.log("moi")}
-			/>
-		</View>
-	)
-}
-
-
-const CardsWrapper = () => {
+const RecipeWrapper = () => {
 	return (
 		<Stack.Navigator
 			screenOptions={{
@@ -154,6 +141,24 @@ const CardsWrapper = () => {
 				component={CardsScreen}
 				/>
 			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
+		</Stack.Navigator>
+	)
+}
+
+const PantryWrapper = () => {
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerShown: true,
+				headerTintColor:"#000",
+				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
+				headerTitleAlign:"center"}}>
+			
+			<Stack.Screen
+				name="Ruokakomero"
+				component={PantryScreen}
+				/>
+			{/* <Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} /> */}
 		</Stack.Navigator>
 	)
 }
