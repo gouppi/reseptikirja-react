@@ -28,19 +28,19 @@ export default function Cards({ navigation }) {
 		}, 1000);
 	}
 
-	const getGreetingByDeviceTime = () => {
+	// const getGreetingByDeviceTime = () => {
 		// TODO: greeting based on date time here?
-		return "Hyvää iltapäivää!";
-	}
+		// return "Hyvää iltapäivää!";
+	// }
 
-	return (
+	return (recipes && recipes.length > 0) ? (
+
 		<View style={styles.cardsContainer}>
 			<FlatList
-				// stickyHeaderIndices={[0]}
 				showsVerticalScrollIndicator={false}
+				stickyHeaderIndices={[0]}
 				ListHeaderComponent={
-				<>
-					<Text style={styles.greeting}>{getGreetingByDeviceTime()}</Text>
+				<View style={styles.inputContainer}>
 					<TextInput
 						style={styles.input}
 						placeholder="Millaista reseptiä etsit tänään?"
@@ -48,7 +48,7 @@ export default function Cards({ navigation }) {
 						onChangeText={changeSearchText}
 						value={searchParam}
 					/>
-				</>}
+				</View>}
 				style={styles.flatList}
 				data={recipes}
 				keyExtractor={d => "recipe_" + d.id}
@@ -67,34 +67,51 @@ export default function Cards({ navigation }) {
 				)}
 			/>
 		</View>
-	);
+	) : (
+		<View style={styles.cardsContainer}>
+			<View style={styles.inputContainer}>
+					<TextInput
+						style={styles.input}
+						placeholder="Millaista reseptiä etsit tänään?"
+						placeholderTextColor={"#888"}
+						onChangeText={changeSearchText}
+						value={searchParam}
+					/>
+			</View>
+			<View style={{flex:1, justifyContent:"center",alignItems:"center"}}>
+				<Text>En löytänyt yhtään reseptiä hakusanallasi :(</Text>
+			</View>
+		</View>
+	) ;
 }
 
 const styles = StyleSheet.create({
 	cardsContainer: {
-		marginTop:10,
-		paddingTop: 40,
 		paddingLeft: 15,
 		paddingRight: 15,
 		flex: 1,
-		backgroundColor: "#F6F6F6",
+		backgroundColor: "#fff",
 		justifyContent: "center",
 	},
 	textAndInput: {
 		flex: 1,
 	},
+	inputContainer: {
+		backgroundColor: "#fff",
+		width:"100%",
+		paddingVertical:10,
+		marginBottom:5,
+	},
 	input: {
-		width: "100%",
 		borderColor: "#c8c8c8",
 		backgroundColor: "#fff",
-		height: 44,
-		marginBottom: 20,
-		marginTop: 10,
+		height: 40,
 		paddingTop: 4,
 		paddingBottom: 4,
 		textAlign: "center",
-		borderWidth: 1,
-		borderRadius: 10,
+		borderBottomWidth: 1,
+		borderBottomColor:"#d8d8d8",
+		borderRadius: 5,
 	},
 	greeting: {
 		textAlign: "center",

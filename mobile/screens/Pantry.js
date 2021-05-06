@@ -20,12 +20,18 @@ import Ingredient from "./../components/Ingredient";
 import StyledButton from "./../components/StyledButton";
 import Chip from "../components/Chip";
 
-export default function Pantry() {
+export default function Pantry({navigation}) {
 	const [scanningMode, setScanningMode] = useState(false);
 	const [hasPermission, setHasPermission] = useState(null);
 	const [scannedEANData, setScannedEANData] = useState(null);
 	const [isModalVisible, setModalVisible] = useState(false);
 	const {ingredients, setIngredients} = usePantryContext();
+
+	React.useLayoutEffect(() => {
+		navigation.setOptions({
+			headerTitle: "Ruokakomero"
+			});
+	}, [navigation]);
 
 	/**
 	* Switches the modal visibility state.

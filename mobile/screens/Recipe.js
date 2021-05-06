@@ -22,8 +22,15 @@ export default function Recipe({route,navigation}) {
 			setRecipe(data);
 		}
 		fetchRecipeData(recipe_id, keywords);
-
 	}, []);
+
+	React.useLayoutEffect(() => {
+		navigation.setOptions({
+		headerRight: () => (
+			<Button onPress={() => setCount(c => c + 1)} title="Update count" />
+		),
+		});
+	}, [navigation]);
 
 
 

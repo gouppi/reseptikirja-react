@@ -1,6 +1,7 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
 import { getData, setData, PANTRY_KEY, PANTRY_KEYWORDS_KEY } from "../workers/AsyncStorageWorker";
-import {fetchRecipes as fetchRecipesAPIWorker} from '../workers/APIWorker';
+import {fetchRecipes as fetchRecipesAPIWorker,
+		fetchSingleRecipe as fetchSingleRecipeAPIWorker} from '../workers/APIWorker';
 
 
 const PantryContext = createContext({});
@@ -9,6 +10,21 @@ const PantryContextProvider = ({ children }) => {
 	const [ingredients, setIngredients] = useState([]);
 	const [keywords, setKeywords] = useState([]);
 	const [recipes, setRecipes] = useState([]);
+
+	const [singleRecipe, setSingleRecipe] = useState(null);
+
+	/** */
+	const fetchSingleRecipe = async (recipe_id) => {
+		let response;
+		try {
+			response = await fetchSingleRecipeAPIWorker(recipe_id, keywords);
+			console.log("Got single recipe " + recipe_id + " response from server.js!");
+			setSingleRecipe(response);
+		} catch(err) {
+			console.log(err);
+		}
+	}
+
 
 	/**
 	 * 
@@ -88,7 +104,7 @@ const PantryContextProvider = ({ children }) => {
 	}
 
 	return (
-		<PantryContext.Provider value={{ ingredients, setIngredients, keywords,fetchRecipes, recipes }}>
+		<PantryContext.Provider value={{ ingredients, setIngredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe }}>
 			{children}
 		</PantryContext.Provider>
 	);

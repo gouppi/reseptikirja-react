@@ -43,6 +43,9 @@ app.post("/recipes/:id", async function (req, res) {
 	console.log("Got keywords -> ", keywords);
 	const recipe_id = req.params.id;
 	
+	if (! keywords) {
+		keywords = [];
+	}
 
 	let result = {};
 	let client = await getClient();
@@ -52,9 +55,12 @@ app.post("/recipes/:id", async function (req, res) {
 		if (result == null) {
 			res.json({});
 		}
-		// TODO: go through keywords, mark which keywords user already has.
-		// Let's do this on backend side, not on client side.
 
+		for (let r of result.ingredients) {
+			for (d of r.data) {
+				d.in_pantry = keywords.includes(d.ingredient);
+			}		
+		}
 
 		res.json(result);
         
