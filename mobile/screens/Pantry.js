@@ -27,13 +27,9 @@ export default function Pantry({navigation}) {
 	const [hasPermission, setHasPermission] = useState(null);
 	const [scannedEANData, setScannedEANData] = useState(null);
 	const [isModalVisible, setModalVisible] = useState(false);
-	const {ingredients, setIngredients} = usePantryContext();
+	const {ingredients, updateIngredients} = usePantryContext();
 
-	// React.useLayoutEffect(() => {
-	// 	navigation.setOptions({
-	// 		headerTitle: "Ruokakomero"
-	// 		});
-	// }, [navigation]);
+	const [EAN, setEAN] = useState('');
 
 	/**
 	* Switches the modal visibility state.
@@ -73,10 +69,7 @@ export default function Pantry({navigation}) {
 	 * @param {object} ingredient incoming ingredient, data coming in from DynamoDB.
 	 **/
 	const addItemToDeviceStorage = ingredient => {
-		let iL = ingredients;
-		iL.push(ingredient); // proper way to leave state variables immutable this way i guess.
-		setIngredients(iL);
-		setData(PANTRY_KEY, JSON.stringify(iL));
+		updateIngredients(ingredient, 'ADD');
 		toggleModal();
 	};
 
@@ -85,10 +78,7 @@ export default function Pantry({navigation}) {
 	 * @param {object} ingredient existing ingredient.
 	 */
 	const removeItemFromDeviceStorage = ingredient => {
-		let iL = ingredients;
-		iL = iL.filter(i => i.ean !== ingredient.ean);
-		setIngredients(iL);
-		setData(PANTRY_KEY, JSON.stringify(iL));
+		updateIngredients(ingredient, 'DELETE');
 		toggleModal();
 	};
 
@@ -100,6 +90,7 @@ export default function Pantry({navigation}) {
 	const handleBarCodeScanned = async ({type, data}) => {
 		setScanningMode(false);
 		let EANResult = await fetchIngredient(data);
+		setEAN(data);
 		setScannedEANData(EANResult);
 		setModalVisible(true);
 	};
@@ -178,6 +169,7 @@ export default function Pantry({navigation}) {
 								: "En löytänyt tuotetta viivakoodilla."
 						}
 						eanData={scannedEANData}
+						EAN={EAN}
 						hasListThisIngredient={hasListThisIngredient}
 						toggleModal={toggleModal}
 						addItemToDeviceStorage={addItemToDeviceStorage}
@@ -193,7 +185,7 @@ export default function Pantry({navigation}) {
 }
 
 function ModalContainer(props) {
-	let {heading,eanData,hasListThisIngredient,addItemToDeviceStorage,removeItemFromDeviceStorage,isModalVisible,toggleModal} = props;
+	let {heading,eanData,EAN,hasListThisIngredient,addItemToDeviceStorage,removeItemFromDeviceStorage,isModalVisible,toggleModal} = props;
 
 	return (
 		<Modal animationType="fade" isVisible={isModalVisible}>
@@ -267,6 +259,9 @@ function ModalContainer(props) {
 						justifyContent: "space-evenly",
 						alignItems: "center",
 					}}>
+
+					{/* <Text>{EAN}</Text> */}
+
 					<StyledButton
 						title="Takaisin"
 						cancelButton

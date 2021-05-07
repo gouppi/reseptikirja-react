@@ -57,7 +57,7 @@ app.post("/recipes/:id", async function (req, res) {
 		}
 
 		for (let r of result.ingredients) {
-			for (d of r.data) {
+			for (let d of r.data) {
 				d.in_pantry = keywords.includes(d.ingredient);
 			}		
 		}

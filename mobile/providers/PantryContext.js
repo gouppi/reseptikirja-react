@@ -1,5 +1,5 @@
-import React, { useContext, createContext, useState, useEffect } from "react";
-import { getData, setData, PANTRY_KEY, PANTRY_KEYWORDS_KEY } from "../workers/AsyncStorageWorker";
+import React, { useContext, useCallback, createContext, useState, useEffect } from "react";
+import { getData, setData, PANTRY_KEY } from "../workers/AsyncStorageWorker";
 import {fetchRecipes as fetchRecipesAPIWorker,
 		fetchSingleRecipe as fetchSingleRecipeAPIWorker} from '../workers/APIWorker';
 
@@ -7,11 +7,57 @@ import {fetchRecipes as fetchRecipesAPIWorker,
 const PantryContext = createContext({});
 const usePantryContext = () => useContext(PantryContext);
 const PantryContextProvider = ({ children }) => {
+	
+	// ingredients contains all scanned ingredients from pantry page. 
 	const [ingredients, setIngredients] = useState([]);
+	// Keywords contains a distinct list of ingredient keywords. (used for API querying).
 	const [keywords, setKeywords] = useState([]);
 	const [recipes, setRecipes] = useState([]);
-
 	const [singleRecipe, setSingleRecipe] = useState(null);
+	const [isFetching, setIsFetching] = useState(false);
+	const [hasBeenInit, setHasBeenInit] = useState(false);
+
+	const [initExecuted, setInitExecuted] = useState(false);
+	const [keywordsSet, setKeywordsSet] = useState(false);
+
+	useEffect(() => {init()}, []);
+
+	const init = async () => {
+		console.log("Running initialization");
+		try {
+			let i = await getData(PANTRY_KEY);
+			i = i === null ? [] : JSON.parse(i);
+			await setIngredients(i);
+			setInitExecuted(true);
+
+		} catch(error) {
+			console.log(error);
+		}
+	}
+
+	useEffect(() => {
+		if (! initExecuted) return;
+		console.log("Ingredients changed. Check keyword status");
+		let all_keywords = [];
+		ingredients.map(i => all_keywords.push(...i.keywords));
+		let newKeywords = all_keywords.filter((value, index, self) => {
+			return self.indexOf(value) === index;
+		});
+		console.log("New keywords: ", newKeywords.join(","));
+		setKeywords(newKeywords);
+		setKeywordsSet(true);
+	}, [initExecuted, ingredients])
+
+	useEffect(() => {
+		if (!initExecuted || !keywordsSet) return;
+		(async () => {
+			console.log("Triggering fetchRecipes (this should trigger only once!)");
+			await fetchRecipes();
+			setHasBeenInit(true);
+		})();
+
+	}, [keywordsSet]);
+
 
 	/** */
 	const fetchSingleRecipe = async (recipe_id) => {
@@ -25,11 +71,8 @@ const PantryContextProvider = ({ children }) => {
 		}
 	}
 
-
-	/**
-	 * 
-	 */
 	const fetchRecipes = async (query) => {
+		console.log("I'm now starting to fetch recipes with query '", query ,"' , and with keywords", keywords.join(','));
 		let response;
 		try {
 			response = await fetchRecipesAPIWorker(query, keywords);
@@ -40,71 +83,60 @@ const PantryContextProvider = ({ children }) => {
 		}
 	}
 
-
-	/** 
-	*	This useEffect fetches the initial dataset from device
-	*	storage (through asyncStorageWorker) and sets it to context
-	*/
-	useEffect(() => {
-		const getFromStorage = async () => {
-			try {
-				console.log("Pantry context async storage worker get data ingredients");
-				let ingredients = await getData(PANTRY_KEY);
-				if (ingredients !== null) {
-					setIngredients(JSON.parse(ingredients));
-					// If we have ingredients in asyncStorage, We possibly have keywords as well.
-					let keywords = await getData(PANTRY_KEYWORDS_KEY);
-					if (keywords !== null) {
-						setKeywords(JSON.parse(keywords));
-					}
-				}
-
-			} catch (err) {
-				console.log(err);
-			}
-		};
-		getFromStorage();
-	}, []);
-
-
-	/** 
-	* 	This useEffect listens for changes happening to ingredients list
-	* 	and updates the change to device storage (through asyncStorageWorker) 
-	*/
-	useEffect(() => {
-		const setToStorage = async () => {
-			if (ingredients === null || ingredients === "undefined") ingredients = [];
-			try {
-				await setData(PANTRY_KEY, JSON.stringify(ingredients));
-				await setData(PANTRY_KEYWORDS_KEY, JSON.stringify(uniqueKeywords(ingredients)));
-			} catch (err) {
-				console.log(err);
-			}
-		};
-		setToStorage();
-	}, [ingredients]);
-
-
 	/**
-	*	Whenever ingredients list changes (user scans new product / removes product from the list), keywords is due to change.
-	* 	We need to keep track which keywords we currently have for this user, so we can use them when querying recipes from DB.
-	*	
-	*	This function takes in all ingredients, loops through them, and combines all ingredients to all_keywords - parameter.
-	*	Once every keyword is stored, we get rid of possible duplicate keywords. 
- 	*/
-	const uniqueKeywords = () => {
-		let all_keywords = [];
-		ingredients.map(ingredient => {
-			all_keywords.push(...ingredient.keywords);
-		});
-		let unique = all_keywords.filter((value, index, self) => {
-			return self.indexOf(value) === index;
-		});
-		return unique;
+	 * This function was added later when I found out one bug in the flow.
+	 * User might open a recipe and the user could have several ingredients (and keywords) stored
+	 * in device already. These are used when fetching data as well.
+	 * 
+	 * If user opens a single recipe, and sees for example, 3 checkmarks (voi, kananmuna, vehnäjauho), 
+	 * and then navigates to pantry page and removes those ingredients and then back to the previous recipe,
+	 * the checkmarks do not disappear (Since they're checked in the backend side)
+	 * 
+	 * There is no point in fetching the same data again, we can just do the keyword check in this specific 
+	 * case (if user makes ingredient changes ADD/DELETE, keywords-list changes, and user has singleRecipe active.)
+	 */
+
+	const updateIngredients = async (ingredient, action) => {
+		let iL = ingredients;
+		if (action === 'ADD' && iL.every(i => i.ean !== ingredient.ean)) {
+			iL = [...iL, ingredient];
+		} else if (action === 'DELETE') {
+			iL = iL.filter(i => i.ean !== ingredient.ean);
+		}
+
+		// if new ingredients diffs from old, save
+		if (iL.length !== ingredients.length) {
+			setIngredients(iL);
+			await setData(PANTRY_KEY, JSON.stringify(iL));
+			// TODO: Here, we are storing new ingredients to state, which then triggers new keywords validation and state save.
+			// How to call CheckRecipeKeywords properly?
+		}
 	}
 
+	const checkRecipeKeywords = () => {
+		let recipe = singleRecipe;
+			for (let r of recipe.ingredients) {
+				for (let d of r.data) {
+					d.in_pantry = keywords.includes(d.ingredient);
+				}
+			}
+		setSingleRecipe(recipe);
+	}
+
+
+
+	
+
+
+
+
+
+	
+
+
+
 	return (
-		<PantryContext.Provider value={{ ingredients, setIngredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe }}>
+		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe, hasBeenInit }}>
 			{children}
 		</PantryContext.Provider>
 	);

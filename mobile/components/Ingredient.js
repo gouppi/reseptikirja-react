@@ -10,7 +10,7 @@ import Chip from "./Chip";
 
 export default function Ingredient({item, onClick}) {
 	return (
-		<TouchableNativeFeedback id={item.ean} onPress={() => onClick(item)}>
+		<TouchableNativeFeedback key={item.ean} onPress={() => onClick(item)}>
 			<View style={styles.ingredient}>
 				<Image style={styles.image} source={{uri: item.image_url}} />
 				<View style={styles.data}>
@@ -19,7 +19,7 @@ export default function Ingredient({item, onClick}) {
 					{/* <Text style={styles.ean}>{item.ean}</Text> */}
 					<View style={styles.keywordsContainer}>
 						{item.keywords?.map((keyword, i) => (
-							<View style={styles.keywordBadge}>
+							<View key={item.ean + '_' + i + '_' + keyword} style={styles.keywordBadge}>
 								<Text>{keyword}</Text>
 							</View>
 							// <Chip key={i} text={keyword} />

@@ -7,8 +7,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Tab = createMaterialTopTabNavigator();
 
-
-
 export default function RecipeNew({route, navigation}) {
 	const {fetchSingleRecipe, singleRecipe} = usePantryContext();
 	const {recipe_id} = route.params;

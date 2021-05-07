@@ -11,6 +11,8 @@ import RecipeScreen from './screens/RecipeNew';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
 
+import NewIngredient from './screens/NewIngredient';
+
 // import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues TODO REMOVE AS USELESS?
 import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
 // import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS TODO REMOVE AS USELESS?
@@ -34,7 +36,7 @@ export default function App() {
  */
 
 const Wrapper = () => {
-	const {fetchRecipes, recipes} = usePantryContext();
+	const {hasBeenInit, recipes} = usePantryContext();
 	const [loaded, setLoaded] = useState(false);
 	
 	// const loadFonts = async() => {
@@ -51,17 +53,17 @@ const Wrapper = () => {
 	 * TODO: Add an additional spinner icon to the splash screen, show it once the request takes more than 2 seconds.
 	 * TODO: Add a toast (messagebox) showing a request failure, if we're unable to perform API request ATM.
 	 */
-	useEffect(() => {
-		(async() => {
-			console.log("Running App useEffect function, calling fetchRecipes @ pantryContext");
-			setTimeout(async() => {
-				let response = await fetchRecipes();	
-				setLoaded(true);
-			}, 2000);
-			// let success = await loadFonts(); // TODO: debug this, loading fonts seems to be bugging somehow.
+	// useEffect(() => {
+	// 	(async() => {
+	// 		console.log("Running App useEffect function, calling fetchRecipes @ pantryContext");
+	// 		setTimeout(async() => {
+	// 			let response = await fetchRecipes();	
+	// 			setLoaded(true);
+	// 		}, 2000);
+	// 		// let success = await loadFonts(); // TODO: debug this, loading fonts seems to be bugging somehow.
 			
-		})();
-	}, []);
+	// 	})();
+	// }, []);
 
 	return (
 		<>
@@ -74,7 +76,7 @@ const Wrapper = () => {
 
 			<AnimatedSplash
 				translucent={true}
-				isLoaded={loaded}
+				isLoaded={hasBeenInit}
 				logoImage={require("./assets/book2.png")}
 				backgroundColor={"#8BCF89"}
 				logoHeight={200}
@@ -158,7 +160,27 @@ const PantryWrapper = () => {
 				name="Ruokakomero"
 				component={PantryScreen}
 				/>
-			{/* <Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} /> */}
+			<Stack.Screen name="NewIngredient" component={NewIngredient} />
 		</Stack.Navigator>
 	)
 }
+
+/**
+	Kun ladataan tiedot -> lähetetään keywordsit backendille ja tehdään ehkä sorttaus.
+	Nyt recipe-data on UI:ssa ja recipet statessa. 
+	Jos käyttäjä nyt menee ja vaihtaa ingredients-listaa pantry-sivulla, PantryContextissa muuttuu mahdollisesti
+	keywords-array.
+
+	Jos keywords array muuttuu:
+
+	- sorttaus ei välttämättä enää pidä paikkaansa (käyttäjä on sortannut ainesosien mukaan, ja sen jälkeen poistaa ainesosat)
+	
+	-> Fix:
+
+	useEffect-hookki kuuntelemaan jos keywords muuttuu, ja tehdään uusi recipe haku.
+
+	removeItemFromDeviceStorage - manipuloi suoraan AsyncStorageWorkeria
+
+	TODO: jos/kun listan sorttaus ja haluaa sortata ainesosien mukaan, triggeröi automaattisesti uudelleenhaku HETI kun keywords muuttuu
+	TODO: Jos pantryContext singleRecipe ei ole tyhjä ja vaihtaa keywords, triggeröi uudelleentarkistus ainesosille!!!!
+ */

@@ -6,7 +6,8 @@ import {
 	View,
 	FlatList,
 	TouchableWithoutFeedback,
-	ScollView
+	ScollView,
+	RefreshControl
 } from "react-native";
 import Card from "../components/Card";
 import {usePantryContext} from '../providers/PantryContext';
@@ -28,6 +29,12 @@ export default function Cards({ navigation }) {
 		}, 1000);
 	}
 
+	const refreshList = async () => {
+		setIsQuerying(true);
+		await fetchRecipes();
+		setIsQuerying(false);
+	}
+
 	// const getGreetingByDeviceTime = () => {
 		// TODO: greeting based on date time here?
 		// return "Hyvää iltapäivää!";
@@ -37,6 +44,13 @@ export default function Cards({ navigation }) {
 
 		<View style={styles.cardsContainer}>
 			<FlatList
+				refreshControl={
+				<RefreshControl
+					refreshing={isQuerying}
+					onRefresh={() => {fetchRecipes()}}
+					/>
+				}
+
 				showsVerticalScrollIndicator={false}
 				stickyHeaderIndices={[0]}
 				ListHeaderComponent={
