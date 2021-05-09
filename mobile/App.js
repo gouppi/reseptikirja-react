@@ -11,7 +11,7 @@ import RecipeScreen from './screens/RecipeNew';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
 
-import NewIngredient from './screens/NewIngredient';
+import IngredientModal from './modals/IngredientModal';
 
 // import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues TODO REMOVE AS USELESS?
 import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
@@ -147,23 +147,26 @@ const RecipeWrapper = () => {
 	)
 }
 
+const PantryStack = createStackNavigator();
 const PantryWrapper = () => {
 	return (
-		<Stack.Navigator
+		<PantryStack.Navigator
 			screenOptions={{
 				headerShown: true,
 				headerTintColor:"#000",
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
 				headerTitleAlign:"center"}}>
 			
-			<Stack.Screen
+			<PantryStack.Screen
 				name="Ruokakomero"
 				component={PantryScreen}
 				/>
-			<Stack.Screen name="NewIngredient" component={NewIngredient} />
-		</Stack.Navigator>
+			<PantryStack.Screen name="Ainesosa" component={IngredientModal} />
+		</PantryStack.Navigator>
 	)
 }
+
+
 
 /**
 	Kun ladataan tiedot -> lähetetään keywordsit backendille ja tehdään ehkä sorttaus.

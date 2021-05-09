@@ -1,18 +1,12 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, {useState} from "react";
 import {
 	StyleSheet,
 	Text,
 	View,
 	SafeAreaView,
-	Button,
 	FlatList,
-	Image,
-	ScrollView,
 } from "react-native";
 import {BarCodeScanner} from "expo-barcode-scanner";
-import {fetchIngredient} from "../workers/APIWorker";
-import Modal from "react-native-modal";
-import {PANTRY_KEY, getData, setData} from "../workers/AsyncStorageWorker";
 
 import {usePantryContext} from "../providers/PantryContext";
 
@@ -20,87 +14,31 @@ import Ingredient from "./../components/Ingredient";
 import StyledButton from "./../components/StyledButton";
 import BetterButton from "./../components/BetterButton";
 
-import Chip from "../components/Chip";
 
 export default function Pantry({navigation}) {
 	const [scanningMode, setScanningMode] = useState(false);
 	const [hasPermission, setHasPermission] = useState(null);
-	const [scannedEANData, setScannedEANData] = useState(null);
-	const [isModalVisible, setModalVisible] = useState(false);
-	const {ingredients, updateIngredients} = usePantryContext();
-
-	const [EAN, setEAN] = useState('');
-
-	/**
-	* Switches the modal visibility state.
-	* @return {void}
-	*/
-	const toggleModal = () => {
-		setModalVisible(!isModalVisible);
-	};
-
-	/** 
-	* Checks if the current state ingredients list contains the given ingredient or not
-	* @param {object} new_ingredient - new ingredient which the user recently scanned
-	* @return {boolean} true if new_ingredient is already in ingredients list, else false.
-	*/
-	const hasListThisIngredient = new_ingredient => ingredients.some(i => i.ean === new_ingredient?.ean);
-
-	/**
-	 * Opens modal, and sets the passed data to state variable.
-	 * @param {any} data data set to be shown in modal.
-	 * @return {void}
-	 */
-	const showModalInfoForData = data => {
-		setScannedEANData(data);
-		setModalVisible(true);
-	};
+	const {ingredients} = usePantryContext();
 
 	/* This validates camera permissions */
-	const validatePermissions = () => {
-		(async () => {
+	const validatePermissions = async () => {
+		if (!hasPermission) {
 			const {status} = await BarCodeScanner.requestPermissionsAsync();
 			setHasPermission(status === "granted");
-		})();
+		}
 	};
 
-	/**
-	 * Adds the scanned item to device storage and closes the modal.
-	 * @param {object} ingredient incoming ingredient, data coming in from DynamoDB.
-	 **/
-	const addItemToDeviceStorage = ingredient => {
-		updateIngredients(ingredient, 'ADD');
-		toggleModal();
-	};
-
-	/**
-	 * Removes an existing ingredient from device storage and closes the modal.
-	 * @param {object} ingredient existing ingredient.
-	 */
-	const removeItemFromDeviceStorage = ingredient => {
-		updateIngredients(ingredient, 'DELETE');
-		toggleModal();
-	};
-
-	// TODO: Either use async here, or wrap APIWorker calls inside Promises so these are non-blocking.
-	// Why? - you ask. Because if the execution is asyncronous and we're waiting an external API to repond
-	// For our call, but it takes forever, the user only sees the ingredients list and nothing happens.
-	// TODO: This could be fixed also by setting some kind of spinner state "isLoading, setIsLoading",
-	// Which is reset once the fetchIngredient request is finished.
-	const handleBarCodeScanned = async ({type, data}) => {
+	const barCodeScanned = async ({type, data}) => {
 		setScanningMode(false);
-		let EANResult = await fetchIngredient(data);
-		setEAN(data);
-		setScannedEANData(EANResult);
-		setModalVisible(true);
-	};
+		navigation.navigate('Ainesosa', {newEan: data});
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
 			{scanningMode ? (
 				<>
 					<BarCodeScanner
-						onBarCodeScanned={scanningMode && handleBarCodeScanned}
+						onBarCodeScanned={scanningMode && barCodeScanned}
 						style={StyleSheet.absoluteFillObject}
 					/>
 					<View style={{position: "absolute", bottom: 20}}>
@@ -121,7 +59,6 @@ export default function Pantry({navigation}) {
 							width: "100%",
 							marginBottom: 10,
 						}}>
-						{/* <Text style={styles.pantryText}>Ruokakomerosi</Text> */}
 						{ingredients.length > 0 ? (
 							<FlatList
 								style={{width: "100%", paddingHorizontal: 10}}
@@ -131,7 +68,7 @@ export default function Pantry({navigation}) {
 									<Ingredient
 										key={index}
 										item={item}
-										onClick={showModalInfoForData}
+										onClick={() => navigation.navigate('Ainesosa', {newEan: item.ean})}
 									/>
 								)}
 							/>
@@ -162,128 +99,10 @@ export default function Pantry({navigation}) {
 							}}
 						/>
 					</View>
-					<ModalContainer
-						heading={
-							scannedEANData?.hasOwnProperty("name")
-								? "Viivakoodia vastaava tuote"
-								: "En löytänyt tuotetta viivakoodilla."
-						}
-						eanData={scannedEANData}
-						EAN={EAN}
-						hasListThisIngredient={hasListThisIngredient}
-						toggleModal={toggleModal}
-						addItemToDeviceStorage={addItemToDeviceStorage}
-						removeItemFromDeviceStorage={
-							removeItemFromDeviceStorage
-						}
-						isModalVisible={isModalVisible}
-					/>
+					
 				</>
 			)}
 		</SafeAreaView>
-	);
-}
-
-function ModalContainer(props) {
-	let {heading,eanData,EAN,hasListThisIngredient,addItemToDeviceStorage,removeItemFromDeviceStorage,isModalVisible,toggleModal} = props;
-
-	return (
-		<Modal animationType="fade" isVisible={isModalVisible}>
-			<SafeAreaView style={{backgroundColor: "#fff"}}>
-				<View style={{paddingVertical: 20}}>
-					<Text
-						style={{
-							textAlign: "center",
-							fontSize: 20,
-							marginBottom: 10,
-						}}>
-						{heading}
-					</Text>
-				</View>
-				{eanData?.hasOwnProperty("name") ? (
-					<>
-						<Image
-							style={styles.modalDataImage}
-							source={{uri: eanData?.image_url}}
-						/>
-						<View style={{display: "flex", alignItems: "center"}}>
-							<Text style={styles.modalDataBrand}>
-								{eanData?.brand}
-							</Text>
-							<Text style={styles.modalDataName}>
-								{eanData?.name}
-							</Text>
-							<Text style={styles.modalDataEan}>
-								{eanData?.ean}
-							</Text>
-						</View>
-
-						<Text
-							style={{
-								textAlign: "center",
-								fontSize: 20,
-								marginBottom: 8,
-							}}>
-							Avainsanat:
-						</Text>
-						<View
-							style={{
-								flexDirection: "row",
-								flexWrap: "wrap",
-								marginHorizontal: 20,
-								marginTop: 4,
-								marginBottom: 20,
-							}}>
-							{eanData?.keywords?.map((keyword, i) => (
-								<Chip key={i} text={keyword} />
-							))}
-						</View>
-					</>
-				) : (
-					<>
-						<View style={{display: "flex", alignItems: "center"}}>
-							<Text>
-								Uuden tuotteen lisäämistoiminto lisätään
-								myöhemmin.
-							</Text>
-						</View>
-					</>
-				)}
-
-				<View
-					style={{
-						paddingBottom: 20,
-						flexWrap: "wrap",
-						display: "flex",
-						flexDirection: "row",
-						justifyContent: "space-evenly",
-						alignItems: "center",
-					}}>
-
-					{/* <Text>{EAN}</Text> */}
-
-					<StyledButton
-						title="Takaisin"
-						cancelButton
-						onPress={toggleModal}
-					/>
-					{eanData && hasListThisIngredient(eanData) ? (
-						<StyledButton
-							deleteButton
-							title="Poista ruokakomerosta"
-							onPress={() => removeItemFromDeviceStorage(eanData)}
-						/>
-					) : (
-						eanData?.hasOwnProperty("ean") && (
-							<StyledButton
-								title="Lisää ruokakomeroon"
-								onPress={() => addItemToDeviceStorage(eanData)}
-							/>
-						)
-					)}
-				</View>
-			</SafeAreaView>
-		</Modal>
 	);
 }
 
@@ -293,33 +112,5 @@ const styles = StyleSheet.create({
 		backgroundColor: "#F6F6F6",
 		alignItems: "center",
 		justifyContent: "center",
-	},
-	pantryText: {
-		fontSize: 24,
-		fontWeight: "600",
-		marginBottom: 30,
-		textAlign: "center",
-	},
-	modalDataContainer: {
-		display: "flex",
-		flexDirection: "column",
-	},
-	modalDataImage: {
-		borderRadius: 10,
-		height: 128,
-		resizeMode: "contain",
-		marginBottom: 8,
-	},
-	modalDataBrand: {
-		fontSize: 15,
-		fontStyle: "italic",
-	},
-	modalDataName: {
-		fontSize: 16,
-		marginBottom: 4,
-	},
-	modalDataEan: {
-		fontSize: 10,
-		marginBottom: 20,
-	},
+	}
 });

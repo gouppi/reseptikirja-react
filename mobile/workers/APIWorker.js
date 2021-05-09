@@ -15,7 +15,7 @@ let APIKit = axios.create({
  * @param keywords {array<string>} ingredient-based keywords, unique array of strings. Provided to DB as well.
  *  
  */
-export async function fetchRecipes(search_term?: string, keywords?: Array<string>) {
+export async function fetchRecipes(search_term, keywords) {
 	try {
 		const result = await APIKit.post(RECIPES_ENDPOINT, {
 			search_term:search_term,
@@ -38,7 +38,7 @@ export async function fetchRecipes(search_term?: string, keywords?: Array<string
  * @param keywords {array<string>}
  */
 
-export async function fetchSingleRecipe(recipe_id: string, keywords?: Array<string>) {
+export async function fetchSingleRecipe(recipe_id, keywords) {
 	console.log("Fetch Single Recipe triggered with following data");
 	console.log("REcipe id", recipe_id);
 	console.log("Keywords: ", keywords?.join(','));
@@ -54,8 +54,18 @@ export async function fetchSingleRecipe(recipe_id: string, keywords?: Array<stri
 	return false;
 }
 
+export async function fetchAllKeywords() {
+	try {
+		const result = await APIKit.get(KEYWORDS_ENDPOINT);
+		// return result.data;
+	} catch (error) {
+		console.log("FETCH KEYWORDS ERROR:");
+		console.log(error);
+	}
+	return false;
+}
 
-export async function fetchIngredient(ean: string) {
+export async function fetchIngredient(ean) {
 	try {
 		const result = await APIKit.get(INGREDIENT_ENDPOINT + '/' + ean);
 		return result.data;
@@ -69,3 +79,7 @@ export async function fetchIngredient(ean: string) {
 module.exports.fetchIngredient = fetchIngredient;
 module.exports.fetchRecipes = fetchRecipes;
 module.exports.fetchSingleRecipe = fetchSingleRecipe;
+
+const ingredients_dummy = [
+	"vehnäjauho","kananmuna","aprikoosi","soijarouhe","maito","kaurajuoma","seitan"
+];

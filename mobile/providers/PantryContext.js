@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, createContext, useState, useEffect } from "react";
+import React, { useContext, useCallback, createContext, useState, useEffect, useRef } from "react";
 import { getData, setData, PANTRY_KEY } from "../workers/AsyncStorageWorker";
 import {fetchRecipes as fetchRecipesAPIWorker,
 		fetchSingleRecipe as fetchSingleRecipeAPIWorker} from '../workers/APIWorker';
@@ -14,11 +14,14 @@ const PantryContextProvider = ({ children }) => {
 	const [keywords, setKeywords] = useState([]);
 	const [recipes, setRecipes] = useState([]);
 	const [singleRecipe, setSingleRecipe] = useState(null);
-	const [isFetching, setIsFetching] = useState(false);
 	const [hasBeenInit, setHasBeenInit] = useState(false);
 
 	const [initExecuted, setInitExecuted] = useState(false);
 	const [keywordsSet, setKeywordsSet] = useState(false);
+
+	const [newIngredientEAN, setNewIngredientEAN] = useState(null); // If we scan an EAN, this state changes.
+	const keywordsChanged = useRef(false); // TODO: Check how to properly use this useRef, you need this when user changes ingredients @124
+	 
 
 	useEffect(() => {init()}, []);
 
@@ -48,6 +51,7 @@ const PantryContextProvider = ({ children }) => {
 		setKeywordsSet(true);
 	}, [initExecuted, ingredients])
 
+
 	useEffect(() => {
 		if (!initExecuted || !keywordsSet) return;
 		(async () => {
@@ -55,7 +59,6 @@ const PantryContextProvider = ({ children }) => {
 			await fetchRecipes();
 			setHasBeenInit(true);
 		})();
-
 	}, [keywordsSet]);
 
 
@@ -97,6 +100,7 @@ const PantryContextProvider = ({ children }) => {
 	 */
 
 	const updateIngredients = async (ingredient, action) => {
+		const refKeyword = keywordsChanged.current;
 		let iL = ingredients;
 		if (action === 'ADD' && iL.every(i => i.ean !== ingredient.ean)) {
 			iL = [...iL, ingredient];
@@ -108,12 +112,19 @@ const PantryContextProvider = ({ children }) => {
 		if (iL.length !== ingredients.length) {
 			setIngredients(iL);
 			await setData(PANTRY_KEY, JSON.stringify(iL));
+			console.log("KUTSUN REFKEYWORDIA NYT TRUE ARVOLLA");
+			refKeyword.current=true;
+
 			// TODO: Here, we are storing new ingredients to state, which then triggers new keywords validation and state save.
 			// How to call CheckRecipeKeywords properly?
 		}
 	}
 
+	// TODO: You need this once you want to update singleRecipe existing ingredients immediately after updateIngredients function call.
 	const checkRecipeKeywords = () => {
+		console.log("checkRecipeKeywords triggered as callback");
+		if (!keywordsChanged.current) return;
+		console.log("... and processing it, since updateIngredients has checked refkeyword to true");
 		let recipe = singleRecipe;
 			for (let r of recipe.ingredients) {
 				for (let d of r.data) {
@@ -121,12 +132,18 @@ const PantryContextProvider = ({ children }) => {
 				}
 			}
 		setSingleRecipe(recipe);
+		keywordsChanged.current = false;
 	}
 
 
+	// useEffect(() => {
+	// 	if (! initExecuted || ! newIngredientEAN) return;
+	// 	console.log("PantryContext triggered, got EAN CODE: ", newIngredientEAN);
+	// }, [newIngredientEAN, initExecuted ])
+
 
 	
-
+	useEffect(() => {checkRecipeKeywords()}, [keywords])
 
 
 
@@ -136,7 +153,7 @@ const PantryContextProvider = ({ children }) => {
 
 
 	return (
-		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe, hasBeenInit }}>
+		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe, hasBeenInit, setNewIngredientEAN }}>
 			{children}
 		</PantryContext.Provider>
 	);
