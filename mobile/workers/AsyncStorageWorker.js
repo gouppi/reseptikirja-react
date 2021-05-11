@@ -10,7 +10,7 @@ export const PANTRY_KEYWORDS_KEY = "@PANTRY_KEYWORDS";
 *	@return mixed
 */
 export const getData = async (key) => {
-  console.log("GET DATA", key);
+  // console.log("GET DATA", key);
   let data;
   try {
     data = await AsyncStorage.getItem(key);
@@ -31,7 +31,7 @@ export const getData = async (key) => {
 export const setData = async (key, value) => {
   try {
     await AsyncStorage.setItem(key, value);
-    console.log(`SetItem call with key ${key} was successful`);
+    // console.log(`SetItem call with key ${key} was successful`);
   } catch (e) {
     console.log(e);
   }

@@ -79,7 +79,3 @@ export async function fetchIngredient(ean) {
 module.exports.fetchIngredient = fetchIngredient;
 module.exports.fetchRecipes = fetchRecipes;
 module.exports.fetchSingleRecipe = fetchSingleRecipe;
-
-const ingredients_dummy = [
-	"vehnäjauho","kananmuna","aprikoosi","soijarouhe","maito","kaurajuoma","seitan"
-];

@@ -40,9 +40,8 @@ app.use(bodyParser.json());
  */
 
 app.post("/recipes/:id", async function (req, res) {
-	console.log("Got request to /recipes/:id, :id equals", req.params, ", got keywords -> ", keywords.join(','));
 	let {keywords} = req.body;
-	console.log();
+	console.log("Got request to /recipes/:id, :id equals", req.params, ", got keywords -> ", keywords);
 	const recipe_id = req.params.id;
 	
 	if (! keywords) {
@@ -67,7 +66,7 @@ app.post("/recipes/:id", async function (req, res) {
 		res.json(result);
         
 	} catch (err) {
-		console.log(err);
+		console.log("SINGLE RECIPE FETCH ERROR", err);
 		res.json(result);
 	}
 
@@ -83,9 +82,8 @@ app.post("/recipes/:id", async function (req, res) {
  * @return {array<object>} Array of Recipe objects.  
  **/
 app.post("/recipes", async function (req, res) {
-	console.log("Got request to /recipes!");
 	let {search_term, keywords} = req.body;
-	console.log("Backend:: Search_term: ", search_term, "Keywords:", keywords?.join(','));
+	console.log("Got request to /recipes, search_term: ", search_term, "Keywords:", keywords?.join(','));
 	
 	let aggregations = [
 		{$project: {
@@ -135,10 +133,10 @@ app.post("/recipes", async function (req, res) {
 	let client = await getClient();
 	const db = await client.db(MONGO_DB);
     try {
-		let collection = await db.collection("recipes").aggregate(aggregations).toArray((err, results) => {
+		await db.collection("recipes").aggregate(aggregations).toArray((err, results) => {
 			// console.log(err,results);
-			console.log("ERRORS", err);
-			console.log("RESULTS length:", results.length);
+			// console.log("ERRORS", err);
+			// console.log("RESULTS length:", results.length);
 			res.json(results);
 		});
         
@@ -157,20 +155,13 @@ app.get("/ingredients/:ean", async function (req, res) {
 	const EAN = req.params.ean.replace(/\D/g, "").slice(0, 13); // Sanitize to 13 char
 	console.log("RAW: ", req.params.ean, "SANITIZED: ", EAN);
 	let result = {};
-	// try {
-	// 	let response = await DYNAMODB.get({
-	// 		TableName: "ingredients",
-	// 		Key: {
-	// 			ean: EAN,
-	// 		},
-	// 	}).promise();
-	// 	result = response.hasOwnProperty("Item") ? response.Item : response;
-	// } catch (err) {
-	// 	console.error(
-	// 		"Unable to read item. Error JSON:",
-	// 		JSON.stringify(err, null, 2)
-	// 	);
-	// }
+	try {
+		let client = await getClient();
+		const db = await client.db(MONGO_DB);
+		result = await db.collection("ingredients").findOne({ean:EAN});
+	} catch (err) {
+		console.log(err);
+	}
 	res.json(result);
 });
 

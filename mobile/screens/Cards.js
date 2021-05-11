@@ -93,7 +93,7 @@ export default function Cards({ navigation }) {
 					/>
 			</View>
 			<View style={{flex:1, justifyContent:"center",alignItems:"center"}}>
-				<Text>En löytänyt yhtään reseptiä hakusanallasi :(</Text>
+				<Text>En löytänyt yhtään reseptiä.</Text>
 			</View>
 		</View>
 	) ;

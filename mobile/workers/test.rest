@@ -1,0 +1,19 @@
+
+### All recipes request
+POST http://127.0.0.1:3434/recipes
+content-type: application/json
+{
+    "search_term": "",
+    "keywords": []
+}
+
+### Single recipe request
+POST http://127.0.0.1:3434/recipes/d28e8ccf-15af-41fd-aa4b-c6c3fdf6b188 
+content-type: application/json
+{
+    "keywords": []
+}
+
+
+### Single recipe request
+GET http://127.0.0.1:3434/ingredients/6415712000172

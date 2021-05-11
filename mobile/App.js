@@ -1,5 +1,5 @@
 import React, {useState, useEffect,useContext} from 'react';
-import {StatusBar, Image,View,Text,TextInput} from 'react-native';
+import {StatusBar, Image,View,Text,TextInput,Button} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -92,9 +92,9 @@ const NavigationSection = () => (
 	
 	<NavigationContainer>
 		<Tab.Navigator
-			// tabOptions={{headerShown: true}}
+			tabOptions={{headerShown: true}}
 			screenOptions={({route}) => ({
-				
+					
 				tabBarIcon: ({focused, color, size}) => {
 					let iconName;
 					if (route.name == 'Reseptit') {
@@ -136,11 +136,19 @@ const RecipeWrapper = () => {
 				headerShown: true,
 				headerTintColor:"#000",
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
-				headerTitleAlign:"center"}}>
+				headerTitleAlign:"center",
+				headerRight: () => (
+					<Button
+					  onPress={() => alert('This is a button!')}
+					  title="Info"
+					  color="#000"
+					/>
+				  )}}>
 			
 			<Stack.Screen
 				name="Reseptikirja"
 				component={CardsScreen}
+				
 				/>
 			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
 		</Stack.Navigator>
