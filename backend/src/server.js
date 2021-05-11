@@ -1,3 +1,4 @@
+// import express from 'express';
 const express = require("express");
 const bodyParser = require("body-parser");
 const AWS = require("aws-sdk");
@@ -8,6 +9,7 @@ const MONGO_USER = "lounaskartta";
 const MONGO_PASS = 'wuMhSVFYwFYxT6Y4';
 const MONGO_DB = 'reseptikirja';
 const MONGO_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@cluster0.zhemz.gcp.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`;
+const PORT = process.env.PORT || 3434;
 let mongoClient;
 // END OF MONGO
 
@@ -15,17 +17,17 @@ let mongoClient;
 /**
  *	START OF AWS CREDENTIALS
  */
-const myCredentials = new AWS.CognitoIdentityCredentials({
-	IdentityPoolId: "eu-north-1:e7d063e2-a5bf-46a8-8ae6-ff7e29b1bb0b",
-});
-const myConfig = new AWS.Config({
-	credentials: myCredentials,
-	region: "eu-north-1",
-});
-AWS.config.update(myConfig);
-const DYNAMODB = new AWS.DynamoDB.DocumentClient();
-const S3_BUCKET_NAME = "softanautti-react-recipe-book";
-const S3BUCKET = new AWS.S3({params: {Bucket: S3_BUCKET_NAME}});
+// const myCredentials = new AWS.CognitoIdentityCredentials({
+// 	IdentityPoolId: "eu-north-1:e7d063e2-a5bf-46a8-8ae6-ff7e29b1bb0b",
+// });
+// const myConfig = new AWS.Config({
+// 	credentials: myCredentials,
+// 	region: "eu-north-1",
+// });
+// AWS.config.update(myConfig);
+// // const DYNAMODB = new AWS.DynamoDB.DocumentClient();
+// const S3_BUCKET_NAME = "softanautti-react-recipe-book";
+// const S3BUCKET = new AWS.S3({params: {Bucket: S3_BUCKET_NAME}});
 
 // END OF AWS
 
@@ -38,9 +40,9 @@ app.use(bodyParser.json());
  */
 
 app.post("/recipes/:id", async function (req, res) {
-	console.log("Got request to /recipes/:id, :id equals", req.params);
+	console.log("Got request to /recipes/:id, :id equals", req.params, ", got keywords -> ", keywords.join(','));
 	let {keywords} = req.body;
-	console.log("Got keywords -> ", keywords);
+	console.log();
 	const recipe_id = req.params.id;
 	
 	if (! keywords) {
@@ -155,26 +157,30 @@ app.get("/ingredients/:ean", async function (req, res) {
 	const EAN = req.params.ean.replace(/\D/g, "").slice(0, 13); // Sanitize to 13 char
 	console.log("RAW: ", req.params.ean, "SANITIZED: ", EAN);
 	let result = {};
-	try {
-		let response = await DYNAMODB.get({
-			TableName: "ingredients",
-			Key: {
-				ean: EAN,
-			},
-		}).promise();
-		result = response.hasOwnProperty("Item") ? response.Item : response;
-	} catch (err) {
-		console.error(
-			"Unable to read item. Error JSON:",
-			JSON.stringify(err, null, 2)
-		);
-	}
+	// try {
+	// 	let response = await DYNAMODB.get({
+	// 		TableName: "ingredients",
+	// 		Key: {
+	// 			ean: EAN,
+	// 		},
+	// 	}).promise();
+	// 	result = response.hasOwnProperty("Item") ? response.Item : response;
+	// } catch (err) {
+	// 	console.error(
+	// 		"Unable to read item. Error JSON:",
+	// 		JSON.stringify(err, null, 2)
+	// 	);
+	// }
 	res.json(result);
+});
+
+app.get('/', (req, res) => {
+	res.send('Hello Server.js!');
 });
 
 
 /** TODO: ENDPOINT FOR FETCHING S3 STORED IMAGES */
-app.get("/image/:ean", function (req, res) {});
+// app.get("/image/:ean", function (req, res) {});
 
 
 /**
@@ -189,13 +195,12 @@ const getClient = async () => {
     return mongoClient;
 }
 
-
 /**
  * Asyncronous initialization of the express server.
  * First, mongodb connection is established, and after that, server is enabled.
  */
 (async() =>{
 	await getClient();
-	app.listen(3434);
-	console.log("Express is listening on on port 3434");
+	app.listen(PORT);
+	console.log("Express is listening on on port " + PORT);
 })();
