@@ -8,13 +8,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 const Tab = createMaterialTopTabNavigator();
 
 export default function RecipeNew({route, navigation}) {
-	const {fetchSingleRecipe, singleRecipe} = usePantryContext();
+	const {fetchSingleRecipe, singleRecipe, setSingleRecipe} = usePantryContext();
 	const {recipe_id} = route.params;
 
 	// When user navigates to recipe page, trigger API call to fetch full recipe data. (Search page has lite data).
 	// After the fetch is complete, show the UI.
 	useEffect(() => {
 		fetchSingleRecipe(recipe_id);
+		return () => setSingleRecipe(null);
 	}, []);
 
 	React.useLayoutEffect(() => {

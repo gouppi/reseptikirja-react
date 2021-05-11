@@ -132,7 +132,7 @@ const PantryContextProvider = ({ children }) => {
 	}, [keywords])
 
 	return (
-		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe, hasBeenInit, setNewIngredientEAN }}>
+		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe,setSingleRecipe, hasBeenInit, setNewIngredientEAN }}>
 			{children}
 		</PantryContext.Provider>
 	);
