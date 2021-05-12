@@ -5,7 +5,7 @@ const RECIPES_ENDPOINT = 'recipes';
 const INGREDIENT_ENDPOINT = 'ingredients';
 
 let APIKit = axios.create({
-	baseURL: 'http://192.168.0.102:3434/',
+	baseURL: 'http://35.228.26.195:8000/',
 	timeout: 5000
 });
 

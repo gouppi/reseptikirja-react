@@ -122,12 +122,14 @@ const PantryContextProvider = ({ children }) => {
 
 		// console.log("--- > Keywords Changed, PROCESSING SINGLE RECIPE SINCE ingredients has changed");
 		let recipe = singleRecipe;
-		for (let r of recipe.ingredients) {
-			for (let d of r.data) {
-				d.in_pantry = keywords.includes(d.ingredient);
+		if (recipe) {
+			for (let r of recipe.ingredients) {
+				for (let d of r.data) {
+					d.in_pantry = keywords.includes(d.ingredient);
+				}
 			}
+			setSingleRecipe(recipe);
 		}
-		setSingleRecipe(recipe);
 		setIngredientsChanged(false);
 	}, [keywords])
 

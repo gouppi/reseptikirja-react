@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "reseptikirja-react",
-    "slug": "reseptikirja-react",
-    "version": "1.0.0",
+    "name": "Reseptikirja",
+    "slug": "Reseptikirja",
+    "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.jpg",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,13 +17,15 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.softanautti.reseptikirja",
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.softanautti.reseptikirja"
     },
     "web": {
       "favicon": "./assets/favicon.png"
