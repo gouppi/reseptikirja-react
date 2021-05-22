@@ -3,11 +3,16 @@ import {View,Text,Image, StyleSheet } from 'react-native';
 import {usePantryContext} from "../providers/PantryContext";
 import {fetchIngredient} from '../workers/APIWorker';
 
-import Chip from '../components/Chip';
+// import Chip from '../components/Chip';
 import BetterButton from "./../components/BetterButton";
 import AddNewIngredient from './AddNewIngredient';
 
 import {BASE_URL} from '../workers/APIWorker';
+import { Chip } from 'react-native-elements';
+
+import {Button } from 'react-native-elements'
+import { useTheme } from 'react-native-elements';
+
 
 
 export default function IngredientModal({route,navigation}) {
@@ -22,6 +27,7 @@ export default function IngredientModal({route,navigation}) {
 	const [EAN,setEAN] = useState(null);
 	const [exists, setExists] = useState(STATE_LOADING);
 	const [ingredientData, setIngredientData] = useState({});
+	const {theme} = useTheme();
 		
 	useEffect(() => {
 		if (route && route.hasOwnProperty('params')) {
@@ -69,7 +75,7 @@ export default function IngredientModal({route,navigation}) {
 			exists === STATE_ERROR ? <ContentForStateError/> : 
 			exists === STATE_NOT_IN_PANTRY_NOT_IN_DB ? <AddNewIngredient EAN={EAN} navigation={navigation}/> : 
 			(
-			<View style={{display:"flex",flex:1,justifyContent:"center",alignItems:"center",margin:20}}>
+			<View style={{display:"flex",flex:1,justifyContent:"center",alignItems:"center"}}>
 				<IngredientDataComponent ingredientData={ingredientData} />
 				<ButtonsComponent navigation={navigation} ingredientData={ingredientData} showRemove={exists == STATE_IN_PANTRY} showAdd={exists == STATE_NOT_IN_PANTRY_EXISTS_IN_DB} />
 			</View>
@@ -77,6 +83,7 @@ export default function IngredientModal({route,navigation}) {
 }
 
 const IngredientDataComponent = ({ingredientData}) => {
+	const {theme} = useTheme();
 	return ingredientData && Object.keys(ingredientData).length > 0 && (
 		<>
 		<Image
@@ -84,12 +91,15 @@ const IngredientDataComponent = ({ingredientData}) => {
 			source={{uri: BASE_URL +  ingredientData.image_url}}
 		/>
 		<View style={{display: "flex", alignItems: "center"}}>
-			<Text style={styles.modalDataBrand}>
-				{ingredientData.brand}
-			</Text>
-			<Text style={styles.modalDataName}>
-				{ingredientData.name}
-			</Text>
+			<View style={{display:"flex", flexDirection:"row"}}>
+				<Text style={styles.modalDataBrand}>
+					{ingredientData.brand + (ingredientData.brand.length > 0 && ' – ' ) + ingredientData.name}
+				</Text>
+				{/* <Text style={styles.modalDataName}>
+					{ingredientData.name}
+				</Text> */}
+			</View>
+
 			<Text style={styles.modalDataEan}>
 				{ingredientData.ean}
 			</Text>
@@ -111,7 +121,7 @@ const IngredientDataComponent = ({ingredientData}) => {
 				marginTop: 4,
 			}}>
 			{ingredientData?.keywords?.map((keyword, i) => (
-				<Chip key={i} text={keyword} />
+				<Chip key={i} title={keyword} />
 			))}
 		</View>
 	</>
@@ -120,10 +130,10 @@ const IngredientDataComponent = ({ingredientData}) => {
 
 const ButtonsComponent = ({ingredientData,navigation,showRemove, showAdd}) => {
 	const {updateIngredients} = usePantryContext();
+	const {theme} = useTheme();
 	return (
 		<View
 			style={{
-				
 				paddingBottom: 20,
 				flexWrap: "wrap",
 				display: "flex",
@@ -132,23 +142,23 @@ const ButtonsComponent = ({ingredientData,navigation,showRemove, showAdd}) => {
 				alignItems: "",
 			}}>
 
-			 <BetterButton
+			 <Button
+			 	buttonStyle={{backgroundColor: theme.colors.grey1}}
 				title="Takaisin"
-				cancelButton
 				onPress={() => {navigation.goBack()}}
 			/>
 
 			<View style={{paddingHorizontal:10}}></View>
 			
 			{showRemove && ( 
-				<BetterButton
-					bgColor={"#dc3545"}
+				<Button
+					buttonStyle={{backgroundColor: theme.colors.error}}
 					title="Poista ruokakomerosta"
 					onPress={() => {updateIngredients(ingredientData, "DELETE"); navigation.goBack();}}
 				/>
 			)}
 			{showAdd && (
-				<BetterButton
+				<Button
 					title="Lisää ruokakomeroon"
 					onPress={() => {updateIngredients(ingredientData, "ADD"); navigation.goBack();}}
 				/>
@@ -171,22 +181,24 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 	},
 	modalDataImage: {
-		minWidth:"25%",
-		borderRadius: 10,
-		height: 128,
-		resizeMode: "contain",
+		width:"100%",
+		height:"100%",
+		maxHeight:200,	
 		marginBottom: 8,
 	},
 	modalDataBrand: {
-		fontSize: 15,
-		fontStyle: "italic",
+		fontSize: 18,
+		fontWeight:"500"
+		
 	},
 	modalDataName: {
-		fontSize: 16,
+		fontSize: 18,
+		fontWeight:"500",
 		marginBottom: 4,
 	},
 	modalDataEan: {
-		fontSize: 10,
-		marginBottom: 20,
+		fontSize: 14,
+		
+		marginVertical: 4,
 	},
 });

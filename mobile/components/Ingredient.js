@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 	},
 	name: {
-		fontSize: 14,
+		fontSize: 16,
 	},
 	keywordsContainer: {
 		paddingTop: 4,

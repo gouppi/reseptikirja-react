@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
 	StyleSheet,
 	Text,
@@ -19,6 +19,21 @@ export default function Cards({ navigation }) {
 	const [searchParam, updateSearchParam] = useState("");
 	const [isQuerying, setIsQuerying] = useState(false);
 
+	const [showLoader, setShowLoader] = useState(false);
+
+	// If querying lasts longer than 500ms, enable loader-mode, which shows FlatList default spinner.
+	const timeout = useRef(null);
+	useEffect(() => {
+		if (isQuerying) {
+			timeout.current = setTimeout(() => {
+				setShowLoader(true);
+			}, 500)
+		} else {
+			clearTimeout(timeout.current);
+			setShowLoader(false);
+		}
+	}, [isQuerying])
+
 	const changeSearchText = (text) => {
 		updateSearchParam(text);
 		clearTimeout(x);
@@ -27,33 +42,35 @@ export default function Cards({ navigation }) {
 			setIsQuerying(true);
 			let data = await fetchRecipes(text);
 			setIsQuerying(false);
-		}, 1000);
+		}, 500);
 	}
 
-	// const refreshList = async () => {
-	// 	setIsQuerying(true);
-	// 	await fetchRecipes();
-	// 	setIsQuerying(false);
-	// }
 
-	// const getGreetingByDeviceTime = () => {
-		// TODO: greeting based on date time here?
-		// return "Hyvää iltapäivää!";
-	// }
-
-	return (recipes && recipes.length > 0) ? (
-
+	return (
 		<View style={styles.cardsContainer}>
 			<FlatList
 				refreshControl={
 				<RefreshControl
-					refreshing={isQuerying}
+					
+					refreshing={isQuerying && showLoader}
 					onRefresh={() => {fetchRecipes()}}
 					/>
 				}
 
 				showsVerticalScrollIndicator={false}
 				stickyHeaderIndices={[0]}
+				ListEmptyComponent={() =>  {
+					return searchParam.length ? (
+						<View style={styles.center}>
+							<Text>En löytänyt reseptejä hakusanallasi.</Text><Text>Kokeile toista hakusanaa!</Text>
+						</View>
+						) :
+					(
+						<View style={styles.center}>
+							<Text>Virhe noudettaessa reseptejä.</Text><Text>Päivitä listaa vetämällä alaspäin.</Text>
+						</View>
+					)	
+				}}
 				ListHeaderComponent={
 				<View style={styles.inputContainer}>
 					<TextInput
@@ -82,22 +99,7 @@ export default function Cards({ navigation }) {
 				)}
 			/>
 		</View>
-	) : (
-		<View style={styles.cardsContainer}>
-			<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
-						placeholder="Millaista reseptiä etsit tänään?"
-						placeholderTextColor={"#888"}
-						onChangeText={changeSearchText}
-						value={searchParam}
-					/>
-			</View>
-			<View style={{flex:1, justifyContent:"center",alignItems:"center"}}>
-				<Text>En löytänyt yhtään reseptiä.</Text>
-			</View>
-		</View>
-	) ;
+	 );
 }
 
 const styles = StyleSheet.create({
@@ -136,4 +138,9 @@ const styles = StyleSheet.create({
 	flatList: {
 		flex:1
 	},
+	center: {
+		flex: 1,
+		justifyContent:"center",
+		alignItems:"center",
+	}
 });

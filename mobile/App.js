@@ -20,15 +20,31 @@ import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, u
 
 import {usePantryContext, PantryContextProvider} from './providers/PantryContext';
 
+import {ThemeProvider} from 'react-native-elements';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
+	const theme = {
+		colors: {
+			primary: "#4AAE47",
+			secondary: "#63BE60",
+			white: "#fff",
+			black:"#000",
+			grey0:"#c8c8c8",
+			grey1:"#8F8F8F",
+			grey2: "#EBEBEB",
+			error: "#CC0000",
 
+		}
+	}
 	return (
-		<PantryContextProvider>
-			<Wrapper/>
-		</PantryContextProvider>
+		<ThemeProvider theme={theme}>
+			<PantryContextProvider>
+				<Wrapper/>
+			</PantryContextProvider>
+		</ThemeProvider>
 	);
 }
 
@@ -61,7 +77,7 @@ const Wrapper = () => {
 				translucent={true}
 				isLoaded={hasBeenInit}
 				logoImage={require("./assets/book2.png")}
-				backgroundColor={"#8BCF89"}
+				backgroundColor={"#63BE60"}
 				logoHeight={200}
 				logoWidth={200}>
 				{NavigationSection()}

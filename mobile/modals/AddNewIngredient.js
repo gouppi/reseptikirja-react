@@ -10,9 +10,10 @@ import {AntDesign} from '@expo/vector-icons';
 import {MaterialIcons} from '@expo/vector-icons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Chip from '../components/Chip';
+
 import {createIngredient} from '../workers/APIWorker';
 
-
+import { useTheme } from 'react-native-elements';
 
 export default function AddNewIngredient({EAN, navigation}) {
 	const [focus, setFocus] = useState(false);
@@ -27,6 +28,10 @@ export default function AddNewIngredient({EAN, navigation}) {
 
 	const [newIngredientName, setNewIngredientName] = useState("");
 	const [newIngredientBrand, setNewIngredientBrand] = useState("");
+
+	// Disable duplicate sends when user clicks submit button.
+	const [submitButtonEnabled, setSubmitButtonEnabled] = useState(true);
+	const {theme} = useTheme();
 
 	useEffect(() => {
 		console.log("Haen kaikki avainsanat");
@@ -60,7 +65,10 @@ export default function AddNewIngredient({EAN, navigation}) {
 			uri: Platform.OS === 'ios' ? userSelectedImage.uri.replace('file://', '') : userSelectedImage.uri,
 		});
 		
+		// TODO: disable submit button
+		setSubmitButtonEnabled(false);
 		let result = await createIngredient(data);
+		setSubmitButtonEnabled(true);
 		console.log(result);
 
 	}
@@ -204,14 +212,6 @@ export default function AddNewIngredient({EAN, navigation}) {
 								</View>
 
 							</View>
-							{/** TODO: Tähän kohti submit nappi joka triggeröi datan lähetyksen backendille. sinne pitää lentää
-							 *  Kuva
-							 *  Tuotteen nimi
-							 *  Tuotteen merkki
-							 *  EAN
-							 *  Avainsana-Array
-							 *  @see https://stackoverflow.com/questions/52830312/how-to-upload-image-to-server-using-axios-in-react-native
-							 */}
 						</View>
 					</ProgressStep>
 				</ProgressSteps>

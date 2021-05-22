@@ -95,6 +95,14 @@ app.post("/recipes/:id", async function (req, res) {
  * @return {array<object>} Array of Recipe objects.  
  **/
 app.post("/recipes", async function (req, res) {
+
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	  }
+	
+	await sleep(3000);
+	
+
 	let {search_term, keywords} = req.body;
 	console.log("Got request to /recipes, search_term: ", search_term, "Keywords:", keywords?.join(','));
 	
@@ -242,6 +250,9 @@ app.post("/ingredients", upload.single('ingredient_image'), async function(req,r
 
 	// console.log(req.file);
 	 console.log(EAN,name,brand,keywords);
+
+
+
 
 
 	try {

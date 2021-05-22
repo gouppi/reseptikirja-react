@@ -6,19 +6,18 @@ import {
 	SafeAreaView,
 	FlatList,
 } from "react-native";
+
 import {BarCodeScanner} from "expo-barcode-scanner";
-
 import {usePantryContext} from "../providers/PantryContext";
-
-import Ingredient from "./../components/Ingredient";
-import StyledButton from "./../components/StyledButton";
-import BetterButton from "./../components/BetterButton";
-
+import { ListItem, Avatar, Button } from 'react-native-elements'
+import { useTheme } from 'react-native-elements';
+import {BASE_URL} from '../workers/APIWorker';
 
 export default function Pantry({navigation}) {
 	const [scanningMode, setScanningMode] = useState(false);
 	const [hasPermission, setHasPermission] = useState(null);
 	const {ingredients} = usePantryContext();
+	const {theme} = useTheme();
 
 	/* This validates camera permissions */
 	const validatePermissions = async () => {
@@ -43,8 +42,10 @@ export default function Pantry({navigation}) {
 						style={StyleSheet.absoluteFillObject}
 					/>
 					<View style={{position: "absolute", bottom: 20}}>
-						<StyledButton
-							cancelButton
+						<Button
+							type="outline"
+							titleStyle={{color:theme.colors.black}}
+							style={{backgroundColor:theme.colors.grey2}}
 							onPress={() => setScanningMode(false)}
 							title="Peruuta"
 						/>
@@ -62,15 +63,18 @@ export default function Pantry({navigation}) {
 						}}>
 						{ingredients.length > 0 ? (
 							<FlatList
-								style={{width: "100%", paddingHorizontal: 10}}
+								style={{width: "100%"}}
 								data={ingredients}
 								keyExtractor={item => "ingredient_" + item.ean}
 								renderItem={({item, index}) => (
-									<Ingredient
-										key={index}
-										item={item}
-										onClick={() => navigation.navigate('Ainesosa', {newEan: item.ean})}
-									/>
+									<ListItem onPress={() => navigation.navigate('Ainesosa', {newEan: item.ean})} key={index} bottomDivider>
+										<Avatar source={{uri: BASE_URL + item.image_url}} />
+											<ListItem.Content>
+												<ListItem.Title>{item.name}</ListItem.Title>
+												<ListItem.Subtitle style={{color: theme.colors.grey1}}>{item.brand}</ListItem.Subtitle>
+											</ListItem.Content>
+											<ListItem.Chevron />
+									</ListItem>
 								)}
 							/>
 						) : (
@@ -92,7 +96,12 @@ export default function Pantry({navigation}) {
 						)}
 					</View>
 					<View style={{marginBottom: 20}}>
-						<BetterButton
+						<Button
+							icon={{
+								name: "search",
+								size:20,
+								color:"white"
+							}}
 							title={"Skannaa viivakoodi"}
 							onPress={async () => {
 								await validatePermissions();
