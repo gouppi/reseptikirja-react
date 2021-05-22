@@ -3,9 +3,13 @@ import axios from 'axios';
 
 const RECIPES_ENDPOINT = 'recipes';
 const INGREDIENT_ENDPOINT = 'ingredients';
+const KEYWORDS_ENDPOINT = 'all_keywords';
+
+export const PROD_URL = 'http://35.228.26.195:8000/'
+export const BASE_URL = "http://192.168.0.106:3434/";
 
 let APIKit = axios.create({
-	baseURL: 'http://35.228.26.195:8000/',
+	baseURL: BASE_URL,
 	timeout: 5000
 });
 
@@ -57,7 +61,7 @@ export async function fetchSingleRecipe(recipe_id, keywords) {
 export async function fetchAllKeywords() {
 	try {
 		const result = await APIKit.get(KEYWORDS_ENDPOINT);
-		// return result.data;
+		return result.data;
 	} catch (error) {
 		console.log("FETCH KEYWORDS ERROR:");
 		console.log(error);
@@ -76,6 +80,26 @@ export async function fetchIngredient(ean) {
 	return false;
 }
 
+export async function createIngredient(data) {
+	console.log("Create ingredient call in apiworker!");
+	console.log("DATA HERE is: ", data);
+
+	const config = {
+		baseURL: 'http://192.168.0.106:3434/',
+		timeout: 5000,
+		headers: {'Content-Type': 'multipart/form-data'}
+	}
+	try {
+		const result = await axios.create(config).post(INGREDIENT_ENDPOINT, data);
+		return result.data;
+	} catch (error) {
+		console.log("CREATE INGREDIENT ERROR, ", error);
+	}
+}
+
 module.exports.fetchIngredient = fetchIngredient;
 module.exports.fetchRecipes = fetchRecipes;
 module.exports.fetchSingleRecipe = fetchSingleRecipe;
+module.exports.fetchAllKeywords = fetchAllKeywords;
+
+module.exports.createIngredient = createIngredient;

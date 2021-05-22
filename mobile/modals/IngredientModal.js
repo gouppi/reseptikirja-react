@@ -4,8 +4,11 @@ import {usePantryContext} from "../providers/PantryContext";
 import {fetchIngredient} from '../workers/APIWorker';
 
 import Chip from '../components/Chip';
-import StyledButton from '../components/StyledButton';
 import BetterButton from "./../components/BetterButton";
+import AddNewIngredient from './AddNewIngredient';
+
+import {BASE_URL} from '../workers/APIWorker';
+
 
 export default function IngredientModal({route,navigation}) {
 
@@ -39,7 +42,7 @@ export default function IngredientModal({route,navigation}) {
 	const checkIngredientFromDB = async (ean) => {
 		let result = await fetchIngredient(ean);
 		let state = STATE_ERROR;
-		if (result && Object.keys(result).length === 0 && result.constructor === Object) {
+		if (!result) {
 			state = STATE_NOT_IN_PANTRY_NOT_IN_DB;
 		} else if (result && Object.keys(result).length > 0) {
 			setIngredientData(result);
@@ -62,19 +65,15 @@ export default function IngredientModal({route,navigation}) {
 		</View>)
 	}
 	
-	const ContentForStateNotInPantryNotInDB = () => {
-		return (<View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text style={{textAlign:"center"}}>Uuden tuotteen {EAN} lisäämistoiminto lisätään myöhemmin.</Text></View>);
-	}
-
 	return exists === STATE_LOADING ? <ContentForStateLoading/> :
 			exists === STATE_ERROR ? <ContentForStateError/> : 
-			exists === STATE_NOT_IN_PANTRY_NOT_IN_DB ? <ContentForStateNotInPantryNotInDB/> : 
+			exists === STATE_NOT_IN_PANTRY_NOT_IN_DB ? <AddNewIngredient EAN={EAN} navigation={navigation}/> : 
 			(
 			<View style={{display:"flex",flex:1,justifyContent:"center",alignItems:"center",margin:20}}>
 				<IngredientDataComponent ingredientData={ingredientData} />
-				<ButtonsComponent ingredientData={ingredientData} navigation={navigation} showRemove={exists == STATE_IN_PANTRY} showAdd={exists == STATE_NOT_IN_PANTRY_EXISTS_IN_DB} />
+				<ButtonsComponent navigation={navigation} ingredientData={ingredientData} showRemove={exists == STATE_IN_PANTRY} showAdd={exists == STATE_NOT_IN_PANTRY_EXISTS_IN_DB} />
 			</View>
-			)
+	)
 }
 
 const IngredientDataComponent = ({ingredientData}) => {
@@ -82,7 +81,7 @@ const IngredientDataComponent = ({ingredientData}) => {
 		<>
 		<Image
 			style={styles.modalDataImage}
-			source={{uri: ingredientData.image_url}}
+			source={{uri: BASE_URL +  ingredientData.image_url}}
 		/>
 		<View style={{display: "flex", alignItems: "center"}}>
 			<Text style={styles.modalDataBrand}>
@@ -111,7 +110,7 @@ const IngredientDataComponent = ({ingredientData}) => {
 				flexWrap: "wrap",
 				marginTop: 4,
 			}}>
-			{ingredientData.keywords?.map((keyword, i) => (
+			{ingredientData?.keywords?.map((keyword, i) => (
 				<Chip key={i} text={keyword} />
 			))}
 		</View>

@@ -1,13 +1,19 @@
 import React, { useContext, createContext, useState, useEffect} from "react";
 import { getData, setData, PANTRY_KEY } from "../workers/AsyncStorageWorker";
 import {fetchRecipes as fetchRecipesAPIWorker,
-		fetchSingleRecipe as fetchSingleRecipeAPIWorker} from '../workers/APIWorker';
+		fetchSingleRecipe as fetchSingleRecipeAPIWorker,
+		fetchIngredient as fetchIngredientAPIWorker} from '../workers/APIWorker';
 
 
 const PantryContext = createContext({});
 const usePantryContext = () => useContext(PantryContext);
 const PantryContextProvider = ({ children }) => {
 	
+	const FETCHING = 1;
+	const ERROR = 2;
+	const FOUND = 3;
+	const NEW = 4;
+
 	// ingredients contains all scanned ingredients from pantry page. 
 	const [ingredients, setIngredients] = useState([]);
 	// Keywords contains a distinct list of ingredient keywords. (used for API querying).
@@ -19,10 +25,15 @@ const PantryContextProvider = ({ children }) => {
 	const [initExecuted, setInitExecuted] = useState(false);
 	const [keywordsSet, setKeywordsSet] = useState(false);
 
-	const [newIngredientEAN, setNewIngredientEAN] = useState(null); // If we scan an EAN, this state changes.
+	// If we scan an EAN, this state changes.
+	const [scanEAN, setNewIngredientEAN] = useState(null);
+	// This state is used in pantry page when user has scanned an ingredient. this state is updated asyncronously.
+	const [ingredientDataFetchState, setIngredientDataFetchState] = useState(0); 
+	// This state is used when EAN scan result is stored into it.
+	const [ingredientDataFetchData, setIngredientDataFethchData] = useState(null);
+
 	const [ingredientsChanged, setIngredientsChanged] = useState(false);
 	 
-
 	useEffect(() => {init()}, []);
 
 	const init = async () => {
@@ -42,7 +53,8 @@ const PantryContextProvider = ({ children }) => {
 		if (! initExecuted) return;
 		// console.log("Ingredients changed. Check keyword status");
 		let all_keywords = [];
-		ingredients.map(i => all_keywords.push(...i.keywords));
+		console.log(ingredients);
+		ingredients.map(i => all_keywords.push(...i.keywords || []));
 		let newKeywords = all_keywords.filter((value, index, self) => {
 			return self.indexOf(value) === index;
 		});
@@ -85,6 +97,29 @@ const PantryContextProvider = ({ children }) => {
 			console.log(err);
 		}
 	}
+
+	/**
+	 * This useEffect listens for any EAN ingredient scans. Whenever user scans an ingredient, fetchIngredient call 
+	 * is done accordingly.
+	 */
+
+	// useEffect(() => {
+	// 	if (newIngredientEAN === null) return;
+	// 	console.log("PantryContext, newIngredientEAN changed, and it's now: ", newIngredientEAN);
+	// 	(async() => {
+	// 		setIngredientDataFetchState(FETCHING);
+	// 		//result can be {} | null | false
+	// 		// {} => result found
+	// 		// null => no result found
+	// 		// false => error fetching
+	// 		let result = await fetchIngredientAPIWorker(newIngredientEAN);
+	// 		let endingState = result === false ? ERROR : result === null ? NEW : FOUND;
+	// 		setIngredientDataFetchState(endingState);
+	// 		console.log(result);
+	// 		setNewIngredientEAN(null)
+	// 	})();
+	// }, [newIngredientEAN]);
+
 
 	/**
 	 * This function was added later when I found out one bug in the flow.
@@ -134,7 +169,7 @@ const PantryContextProvider = ({ children }) => {
 	}, [keywords])
 
 	return (
-		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe,setSingleRecipe, hasBeenInit, setNewIngredientEAN }}>
+		<PantryContext.Provider value={{ updateIngredients, ingredients, keywords,fetchRecipes,recipes,fetchSingleRecipe,singleRecipe,setSingleRecipe, hasBeenInit, setNewIngredientEAN,ingredientDataFetchState }}>
 			{children}
 		</PantryContext.Provider>
 	);

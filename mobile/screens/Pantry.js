@@ -30,7 +30,8 @@ export default function Pantry({navigation}) {
 
 	const barCodeScanned = async ({type, data}) => {
 		setScanningMode(false);
-		navigation.navigate('Ainesosa', {newEan: data});
+		console.log("SENDING NAVIGATION: ", navigation);
+		navigation.navigate('Ainesosa', {newEan: data, navigation: navigation});
 	}
 
 	return (

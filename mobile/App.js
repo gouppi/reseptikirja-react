@@ -7,12 +7,13 @@ import AnimatedSplash from "react-native-animated-splash-screen";
 import * as Font from 'expo-font';
 import 'react-native-gesture-handler';
 
-import RecipeScreen from './screens/RecipeNew';
+import { SingleRecipe as RecipeScreen } from './screens/SingleRecipe';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
 
 import IngredientModal from './modals/IngredientModal';
 
+// import NewIngredientScreen from './screens/depr_NewIngredient';
 // import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues TODO REMOVE AS USELESS?
 import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
 // import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS TODO REMOVE AS USELESS?
@@ -46,24 +47,6 @@ const Wrapper = () => {
 	// 	});
 	// 	console.log("load ASync result", result);
 	// }
-
-	/**
-	 * This useEffect handles pre-fetching initial set of recipes from the API, and only after the request is completed
-	 * (or the request has taken too long) - will the Splash screen hide.
-	 * TODO: Add an additional spinner icon to the splash screen, show it once the request takes more than 2 seconds.
-	 * TODO: Add a toast (messagebox) showing a request failure, if we're unable to perform API request ATM.
-	 */
-	// useEffect(() => {
-	// 	(async() => {
-	// 		console.log("Running App useEffect function, calling fetchRecipes @ pantryContext");
-	// 		setTimeout(async() => {
-	// 			let response = await fetchRecipes();	
-	// 			setLoaded(true);
-	// 		}, 2000);
-	// 		// let success = await loadFonts(); // TODO: debug this, loading fonts seems to be bugging somehow.
-			
-	// 	})();
-	// }, []);
 
 	return (
 		<>
@@ -109,16 +92,16 @@ const NavigationSection = () => (
 			})}
 			
 			tabBarOptions={{
-				
+				labelPosition:"below-icon",
 				headerShown:true,
 				headerBackTitle:" ",
 				headerTitleAlign:"center",
 				labelStyle: {
-					fontSize:14,
-					paddingBottom:4
+					fontSize:12,
+					paddingBottom:2
 				},
 				
-				activeTintColor: '#4AAE47',
+				activeTintColor: '#000',
 				inactiveTintColor:'gray',
 			}}
 			>
@@ -137,13 +120,7 @@ const RecipeWrapper = () => {
 				headerTintColor:"#000",
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
 				headerTitleAlign:"center",
-				headerRight: () => (
-					<Button
-					  onPress={() => alert('This is a button!')}
-					  title="Info"
-					  color="#000"
-					/>
-				  )}}>
+				}}>
 			
 			<Stack.Screen
 				name="Reseptikirja"

@@ -2,34 +2,13 @@
   "expo": {
     "name": "Reseptikirja",
     "slug": "Reseptikirja",
-    "version": "0.1.0",
+    "description": "Sovellus, joka näyttää sinulle mitä voit tehdä ainesosistasi!",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo.jpg",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "bundleIdentifier": "com.softanautti.reseptikirja",
-      "supportsTablet": true
-    },
+    "sdkVersion": "41.0.0",
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      },
       "package": "com.softanautti.reseptikirja"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "sdkVersion": "41.0.0"
+    }
   }
 }

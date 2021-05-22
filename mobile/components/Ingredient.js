@@ -6,13 +6,14 @@ import {
 	Image,
 	TouchableNativeFeedback,
 } from "react-native";
-import Chip from "./Chip";
+// import Chip from "./Chip";
+import {BASE_URL} from '../workers/APIWorker';
 
 export default function Ingredient({item, onClick}) {
 	return (
 		<TouchableNativeFeedback key={item.ean} onPress={() => onClick(item)}>
 			<View style={styles.ingredient}>
-				<Image style={styles.image} source={{uri: item.image_url}} />
+				<Image style={styles.image} source={{uri: BASE_URL+item.image_url}} />
 				<View style={styles.data}>
 					<Text style={styles.name}>{item.name}</Text>
 					{/* <Text style={styles.brand}>{item.brand}</Text> */}
@@ -33,7 +34,7 @@ export default function Ingredient({item, onClick}) {
 
 const styles = StyleSheet.create({
 	ingredient: {
-		// flex:1,
+		
 		marginBottom: 8,
 		width: "100%",
 		paddingVertical: 10,
@@ -51,6 +52,8 @@ const styles = StyleSheet.create({
 		shadowRadius: 2.62,
 	},
 	image: {
+		// borderWidth:2,
+		// borderColor:"black",
 		height: 48,
 		maxWidth: "20%",
 		width: "10%",
@@ -58,11 +61,12 @@ const styles = StyleSheet.create({
 		marginHorizontal: 10,
 	},
 	data: {
+		
 		display: "flex",
 		flexDirection: "column",
 	},
 	name: {
-		fontSize: 16,
+		fontSize: 14,
 	},
 	keywordsContainer: {
 		paddingTop: 4,

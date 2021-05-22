@@ -7,7 +7,8 @@ import {
 	FlatList,
 	TouchableWithoutFeedback,
 	ScollView,
-	RefreshControl
+	RefreshControl,
+	ActivityIndicator
 } from "react-native";
 import Card from "../components/Card";
 import {usePantryContext} from '../providers/PantryContext';
@@ -29,11 +30,11 @@ export default function Cards({ navigation }) {
 		}, 1000);
 	}
 
-	const refreshList = async () => {
-		setIsQuerying(true);
-		await fetchRecipes();
-		setIsQuerying(false);
-	}
+	// const refreshList = async () => {
+	// 	setIsQuerying(true);
+	// 	await fetchRecipes();
+	// 	setIsQuerying(false);
+	// }
 
 	// const getGreetingByDeviceTime = () => {
 		// TODO: greeting based on date time here?
@@ -133,6 +134,6 @@ const styles = StyleSheet.create({
 		fontWeight: "500"
 	},
 	flatList: {
-		// flex:1
+		flex:1
 	},
 });

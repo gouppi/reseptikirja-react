@@ -1,6 +1,6 @@
 
 
-POST http://35.228.26.195:8000/recipes
+POST http://127.0.0.1:3434/recipes
 content-type: application/json
 
 {
@@ -19,3 +19,10 @@ content-type: application/json
 
 ### Single recipe request
 GET http://35.228.26.195:8000/ingredients/8710437001700
+
+
+### Gets all similar keywords matching typed 
+GET http://127.0.0.1:3434/keywords?query=so
+
+### Returns all keywords
+GET http://127.0.0.1:3434/all_keywords
