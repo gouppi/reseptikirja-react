@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import { View,Text, SafeAreaView,Image,ScrollView,SectionList, Animated,Button,TouchableWithoutFeedback} from 'react-native'
+import { View, SafeAreaView,Image,ScrollView,SectionList, Animated,Button,TouchableWithoutFeedback,ActivityIndicator} from 'react-native'
 import {usePantryContext} from '../providers/PantryContext';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Text, useTheme } from 'react-native-elements';
 
 
 const Tab = createMaterialTopTabNavigator();
@@ -10,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 export function SingleRecipe({route, navigation}) {
 	const {fetchSingleRecipe, singleRecipe, setSingleRecipe} = usePantryContext();
 	const {recipe_id} = route.params;
-
+	const {theme} = useTheme();
 	// When user navigates to recipe page, trigger API call to fetch full recipe data. (Search page has lite data).
 	// After the fetch is complete, show the UI.
 	useEffect(() => {
@@ -26,7 +27,7 @@ export function SingleRecipe({route, navigation}) {
 
 
 	return (
-		singleRecipe === null ? (<View style={{flex:1,justifyContent:"center",alignItems:"center"}}><Text>Loading</Text></View>) :
+		singleRecipe === null ? (<View style={{flex:1,justifyContent:"center",alignItems:"center"}}><ActivityIndicator color={theme.colors.grey1}/></View>) :
 			(
 				<SafeAreaView style={{flex:1}}>
 					
@@ -36,8 +37,11 @@ export function SingleRecipe({route, navigation}) {
 						/>
 					<Tab.Navigator
 						tabBarOptions={{
+							labelStyle:{
+								fontFamily:"Quicksand-Bold"
+							},
 							indicatorStyle :{
-								backgroundColor:'#4AAE47'
+								backgroundColor:theme.colors.secondary
 							}}}
 						style={{flex:1}} backBehavior={"none"}  >
 						<Tab.Screen style={{flex:1, minHeight:"100%"}} name="Tarvitset nämä" component={IngredientsTab}/>
@@ -74,11 +78,12 @@ const SectionHeader = ({header}) => {
 }
 
 const IngredientsItem = (item) => {
+	const {theme} = useTheme();
 	return (
 		<View style={{display:"flex",flexDirection:"row", justifyContent:"space-between", alignItems:"center", padding:8, paddingTop:16, backgroundColor:"#fff", width:"100%", borderBottomWidth:1, borderBottomColor: "#f8f8f8"}}>
 			<View style={{display:"flex"}}>
 				<Text style={{fontSize:16, paddingBottom:4}}>
-					{item.ingredient} {item.in_pantry && ( <Ionicons name="checkmark" size={16} color={"green"}/> )}
+					{item.ingredient} {item.in_pantry && ( <Ionicons name="checkmark" size={16} color={theme.colors.primary}/> )}
 				</Text>
 
 				<Text style={{fontSize:13, color:"#888"}}>

@@ -58,6 +58,11 @@ export default function App() {
 			style: {
 				fontFamily: "Quicksand"
 			}
+		},
+		Button: {
+			titleStyle: {
+				fontFamily:"Quicksand-Medium"
+			}
 		}
 	}
 	return (

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import {View,Text,Image, StyleSheet } from 'react-native';
+import {View,Image, StyleSheet } from 'react-native';
 import {usePantryContext} from "../providers/PantryContext";
 import {fetchIngredient} from '../workers/APIWorker';
 
@@ -11,7 +11,7 @@ import {BASE_URL} from '../workers/APIWorker';
 import { Chip } from 'react-native-elements';
 
 import {Button } from 'react-native-elements'
-import { useTheme } from 'react-native-elements';
+import { Text,useTheme,Divider } from 'react-native-elements';
 
 
 
@@ -91,26 +91,19 @@ const IngredientDataComponent = ({ingredientData}) => {
 			source={{uri: BASE_URL +  ingredientData.image_url}}
 		/>
 		<View style={{display: "flex", alignItems: "center"}}>
-			<View style={{display:"flex", flexDirection:"row"}}>
-				<Text style={styles.modalDataBrand}>
-					{ingredientData.brand + (ingredientData.brand.length > 0 && ' – ' ) + ingredientData.name}
-				</Text>
-				{/* <Text style={styles.modalDataName}>
-					{ingredientData.name}
-				</Text> */}
-			</View>
-
 			<Text style={styles.modalDataEan}>
-				{ingredientData.ean}
+				{ingredientData.brand}
+			</Text>
+			<Text style={styles.modalDataEan}>
+				{ingredientData.name}
+			</Text>
+			<Text style={styles.modalDataEan}>
+				EAN: {ingredientData.ean}
 			</Text>
 		</View>
+		<Divider style={{ backgroundColor: theme.colors.grey0, height:1,width:"50%" }} />
 
-		<Text
-			style={{
-				textAlign: "center",
-				fontSize: 20,
-				marginBottom: 8,
-			}}>
+		<Text style={styles.modalDataEan}>
 			Avainsanat:
 		</Text>
 		<View
@@ -197,8 +190,7 @@ const styles = StyleSheet.create({
 		marginBottom: 4,
 	},
 	modalDataEan: {
-		fontSize: 14,
-		
-		marginVertical: 4,
+		fontSize:16,
+		marginVertical:5
 	},
 });
