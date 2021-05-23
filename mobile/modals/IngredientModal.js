@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
 	modalDataImage: {
 		width:"100%",
 		height:"100%",
+		resizeMode:"contain",
 		maxHeight:200,	
 		marginBottom: 8,
 	},

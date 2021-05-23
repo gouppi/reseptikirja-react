@@ -166,7 +166,7 @@ const RecipeWrapper = () => {
 			screenOptions={{
 				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
 				headerShown: true,
-				headerTintColor:theme.colors.grey1,
+				headerTintColor:theme.colors.black,
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
 				headerTitleAlign:"center",
 				}}>
@@ -186,6 +186,7 @@ const PantryWrapper = () => {
 	return (
 		<PantryStack.Navigator
 			screenOptions={{
+				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
 				headerShown: true,
 				headerTintColor:"#000",
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string

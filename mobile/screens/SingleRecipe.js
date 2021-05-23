@@ -72,7 +72,7 @@ const IngredientsTab = ({props}) => {
 const SectionHeader = ({header}) => {
 	return (
 		<View style={{padding:8, backgroundColor:"#fff", width:"100%", borderBottomWidth:1, borderBottomColor: "#ddd"}}>
-			<Text style={{fontSize:20}} >{header}</Text>
+			<Text style={{fontFamily:"Quicksand-Medium",fontSize:20}} >{header}</Text>
 		</View>
 	)
 }
@@ -82,11 +82,11 @@ const IngredientsItem = (item) => {
 	return (
 		<View style={{display:"flex",flexDirection:"row", justifyContent:"space-between", alignItems:"center", padding:8, paddingTop:16, backgroundColor:"#fff", width:"100%", borderBottomWidth:1, borderBottomColor: "#f8f8f8"}}>
 			<View style={{display:"flex"}}>
-				<Text style={{fontSize:16, paddingBottom:4}}>
+				<Text style={{fontSize:16, fontFamily:"Quicksand-Medium", paddingBottom:4}}>
 					{item.ingredient} {item.in_pantry && ( <Ionicons name="checkmark" size={16} color={theme.colors.primary}/> )}
 				</Text>
 
-				<Text style={{fontSize:13, color:"#888"}}>
+				<Text style={{fontSize:14, fontFamily:"Quicksand", color:theme.colors.grey1}}>
 					{item.amount +  " " + item.unit + (item.in_pantry ? ", ruokakomerossa" : "") }
 				</Text>
 			</View>

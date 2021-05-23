@@ -9,8 +9,8 @@ import {
 } from "react-native";
 // import Card from "../components/Card";
 import {usePantryContext} from '../providers/PantryContext';
-import { useTheme } from 'react-native-elements';
-import { Text, Card } from 'react-native-elements';
+import { colors, useTheme } from 'react-native-elements';
+import { Text, Card,SearchBar,CheckBox } from 'react-native-elements';
 
 let x;
 export default function Cards({ navigation }) {
@@ -73,15 +73,23 @@ export default function Cards({ navigation }) {
 				}}
 				ListHeaderComponent={
 				<View style={styles.inputContainer}>
-					<TextInput
-						style={styles.input}
+					<SearchBar
+						containerStyle={{backgroundColor:theme.colors.white, borderBottomWidth:1,borderBottomColor:theme.colors.grey0}}
+						inputStyle={{fontFamily:"Quicksand"}}
+						// inputStyle={{fontSize:16, borderBottomColor: theme.colors.grey0}}
+						platform="android"
+						// inputStyle={{backgroundColor:theme.colors.grey2, fontFamily:"Quicksand", borderWidth:0}}
+						// round={true}
+						// leftIconContainerStyle={{backgroundColor:theme.colors.grey2, borderColor:theme.colors.grey2}}
 						placeholder="Millaista reseptiä etsit tänään?"
 						placeholderTextColor={"#888"}
 						onChangeText={changeSearchText}
 						value={searchParam}
 					/>
+					
+
 				</View>}
-				style={styles.flatList}
+				// style={{...styles.flatList}}
 				data={recipes}
 				keyExtractor={d => "recipe_" + d.id}
 				renderItem={(d) => (
@@ -92,11 +100,12 @@ export default function Cards({ navigation }) {
 							})
 						}
 					>
-							<Card containerStyle={{marginHorizontal:0,paddingHorizontal:0,paddingBottom:0}}>
-							<Card.Title style={{color: theme.colors.black, textAlign:'left', marginLeft: 4}}>{d.item.title}</Card.Title>
-							<Card.Image wrapperStyle={{paddingVertical:0}} source={{uri:d.item.img}}>
-
-							</Card.Image>
+							<Card containerStyle={{marginHorizontal:0,paddingHorizontal:0,paddingBottom:0, borderTopColor: theme.colors.grey2,borderBottomColor: theme.colors.grey2}}>
+								{/* <Card.Title style={{color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.Title> */}
+								<Card.FeaturedTitle style={{fontFamily:"Quicksand-Medium",color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.FeaturedTitle>
+								<Card.FeaturedSubtitle style={{color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.FeaturedSubtitle>
+								<Card.Image wrapperStyle={{paddingVertical:0}} source={{uri:d.item.img}}>
+								</Card.Image>
 						</Card>
 
 						{/* <View>
@@ -108,13 +117,10 @@ export default function Cards({ navigation }) {
 		</View>
 	 );
 }
-
 const styles = StyleSheet.create({
 	cardsContainer: {
-		paddingLeft: 15,
-		paddingRight: 15,
 		flex: 1,
-		backgroundColor: "#fff",
+		backgroundColor: "#f6f6f6",
 		justifyContent: "center",
 	},
 	textAndInput: {
@@ -123,8 +129,8 @@ const styles = StyleSheet.create({
 	inputContainer: {
 		backgroundColor: "#fff",
 		width:"100%",
-		paddingVertical:10,
-		marginBottom:5,
+		// paddingVertical:10,
+		// marginBottom:5,
 	},
 	input: {
 		borderColor: "#c8c8c8",
@@ -135,7 +141,6 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		borderBottomWidth: 1,
 		borderBottomColor:"#d8d8d8",
-		borderRadius: 5,
 	},
 	greeting: {
 		textAlign: "center",
