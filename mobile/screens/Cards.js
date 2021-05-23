@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
 	StyleSheet,
-	Text,
 	TextInput,
 	View,
 	FlatList,
 	TouchableWithoutFeedback,
-	ScollView,
 	RefreshControl,
-	ActivityIndicator
 } from "react-native";
-import Card from "../components/Card";
+// import Card from "../components/Card";
 import {usePantryContext} from '../providers/PantryContext';
+import { useTheme } from 'react-native-elements';
+import { Text, Card } from 'react-native-elements';
 
 let x;
 export default function Cards({ navigation }) {
@@ -20,6 +19,7 @@ export default function Cards({ navigation }) {
 	const [isQuerying, setIsQuerying] = useState(false);
 
 	const [showLoader, setShowLoader] = useState(false);
+	const {theme} = useTheme();
 
 	// If querying lasts longer than 500ms, enable loader-mode, which shows FlatList default spinner.
 	const timeout = useRef(null);
@@ -92,9 +92,16 @@ export default function Cards({ navigation }) {
 							})
 						}
 					>
-						<View>
+							<Card containerStyle={{marginHorizontal:0,paddingHorizontal:0,paddingBottom:0}}>
+							<Card.Title style={{color: theme.colors.black, textAlign:'left', marginLeft: 4}}>{d.item.title}</Card.Title>
+							<Card.Image wrapperStyle={{paddingVertical:0}} source={{uri:d.item.img}}>
+
+							</Card.Image>
+						</Card>
+
+						{/* <View>
 							<Card {...d.item} />
-						</View>
+						</View> */}
 					</TouchableWithoutFeedback>
 				)}
 			/>

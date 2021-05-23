@@ -15,17 +15,34 @@ import IngredientModal from './modals/IngredientModal';
 
 // import NewIngredientScreen from './screens/depr_NewIngredient';
 // import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues TODO REMOVE AS USELESS?
-import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
+// import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
 // import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS TODO REMOVE AS USELESS?
 
 import {usePantryContext, PantryContextProvider} from './providers/PantryContext';
 
 import {ThemeProvider} from 'react-native-elements';
+import { useFonts } from 'expo-font';
+import { useTheme } from 'react-native-elements';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function App() {
+
+	const [fontLoaded] = useFonts({
+		"Quicksand-Bold": require('./assets/fonts/Quicksand-Bold.ttf'),
+		"Quicksand-Light": require('./assets/fonts/Quicksand-Light.ttf'),
+		"Quicksand-Medium": require('./assets/fonts/Quicksand-Medium.ttf'),
+		"Quicksand": require('./assets/fonts/Quicksand-Regular.ttf'),
+		"Quicksand-Semibold": require('./assets/fonts/Quicksand-SemiBold.ttf'),
+	});
+
+	if (!fontLoaded) {
+		return null;
+	}
+
+
 	const theme = {
 		colors: {
 			primary: "#4AAE47",
@@ -36,7 +53,11 @@ export default function App() {
 			grey1:"#8F8F8F",
 			grey2: "#EBEBEB",
 			error: "#CC0000",
-
+		},
+		Text: {
+			style: {
+				fontFamily: "Quicksand"
+			}
 		}
 	}
 	return (
@@ -55,6 +76,7 @@ export default function App() {
 const Wrapper = () => {
 	const {hasBeenInit, recipes} = usePantryContext();
 	const [loaded, setLoaded] = useState(false);
+	const {theme} = useTheme();
 	
 	// const loadFonts = async() => {
 	// 	console.log("Loading fonts");
@@ -63,6 +85,9 @@ const Wrapper = () => {
 	// 	});
 	// 	console.log("load ASync result", result);
 	// }
+	
+
+
 
 	return (
 		<>
@@ -113,6 +138,7 @@ const NavigationSection = () => (
 				headerBackTitle:" ",
 				headerTitleAlign:"center",
 				labelStyle: {
+					fontFamily:"Quicksand-Semibold",
 					fontSize:12,
 					paddingBottom:2
 				},
@@ -129,11 +155,13 @@ const NavigationSection = () => (
 );
 
 const RecipeWrapper = () => {
+	const {theme} = useTheme();
 	return (
 		<Stack.Navigator
 			screenOptions={{
+				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
 				headerShown: true,
-				headerTintColor:"#000",
+				headerTintColor:theme.colors.grey1,
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
 				headerTitleAlign:"center",
 				}}>
