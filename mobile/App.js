@@ -4,28 +4,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import AnimatedSplash from "react-native-animated-splash-screen";
-import 'react-native-gesture-handler';
-
 import { SingleRecipe as RecipeScreen } from './screens/SingleRecipe';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
-
 import IngredientModal from './modals/IngredientModal';
-
-// import NewIngredientScreen from './screens/depr_NewIngredient';
-// import ImmersiveMode from 'react-native-immersive-mode'; // TODO: CHECK LATER linking issues TODO REMOVE AS USELESS?
-// import Ionicons from '@expo/vector-icons/Ionicons'; // TODO remove as useless, use svgs! TODO REMOVE AS USELESS?
-// import * as Svg from 'react-native-svg'; TODO CHECK LATER NAVIGATOR DOES NOT LIKE THIS TODO REMOVE AS USELESS?
-
 import {usePantryContext, PantryContextProvider} from './providers/PantryContext';
-
 import {ThemeProvider} from 'react-native-elements';
 import { useFonts } from 'expo-font';
 import { useTheme } from 'react-native-elements';
-
+import 'react-native-gesture-handler';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const PantryStack = createStackNavigator();
+
 const theme = {
 	colors: {
 		primary: "#4AAE47",
@@ -91,8 +83,6 @@ export default function App() {
 const Wrapper = () => {
 	const {hasBeenInit} = usePantryContext();
 	const {theme} = useTheme();
-	
-
 	return (
 		<>
 			<StatusBar
@@ -116,7 +106,7 @@ const Wrapper = () => {
 
 
 const NavigationSection = () => (
-	
+
 	<NavigationContainer>
 		<Tab.Navigator
 			screenOptions={({route}) => ({
@@ -154,14 +144,14 @@ const NavigationSection = () => (
 	
 );
 
-const HeaderTitle = (props) => {
-	return (
-		<View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-			<Image style={{width:19, height:19}}  source={require('./assets/pantry.png')} />
-			<Text>ReseptiKirjan logo</Text>
-		</View>
-	)
-}
+// const HeaderTitle = (props) => {
+// 	return (
+// 		<View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
+// 			<Image style={{width:19, height:19}}  source={require('./assets/pantry.png')} />
+// 			<Text>ReseptiKirjan logo</Text>
+// 		</View>
+// 	)
+// }
 
 const RecipeWrapper = () => {
 	const {theme} = useTheme();
@@ -183,14 +173,12 @@ const RecipeWrapper = () => {
 			<Stack.Screen
 				name="Reseptikirja"
 				component={CardsScreen}
-				
 				/>
 			<Stack.Screen name="Recipe" component={RecipeScreen} initialParams={{recipe:{title:""}}} />
 		</Stack.Navigator>
 	)
 }
 
-const PantryStack = createStackNavigator();
 const PantryWrapper = () => {
 	return (
 		<PantryStack.Navigator
