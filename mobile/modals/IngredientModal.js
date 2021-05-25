@@ -4,7 +4,6 @@ import {usePantryContext} from "../providers/PantryContext";
 import {fetchIngredient} from '../workers/APIWorker';
 
 // import Chip from '../components/Chip';
-import BetterButton from "./../components/BetterButton";
 import AddNewIngredient from './AddNewIngredient';
 
 import {BASE_URL} from '../workers/APIWorker';

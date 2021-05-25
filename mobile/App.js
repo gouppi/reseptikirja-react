@@ -1,10 +1,9 @@
-import React, {useState, useEffect,useContext} from 'react';
+import React from 'react';
 import {StatusBar, Image,View,Text,TextInput,Button} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import AnimatedSplash from "react-native-animated-splash-screen";
-import * as Font from 'expo-font';
 import 'react-native-gesture-handler';
 
 import { SingleRecipe as RecipeScreen } from './screens/SingleRecipe';
@@ -27,6 +26,40 @@ import { useTheme } from 'react-native-elements';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const theme = {
+	colors: {
+		primary: "#4AAE47",
+		secondary: "#63BE60",
+		white: "#fff",
+		black:"#000",
+		grey0:"#c8c8c8",
+		grey1:"#8F8F8F",
+		grey2: "#EBEBEB",
+		error: "#CC0000",
+	},
+	Text: {
+		style: {
+			fontFamily: "Quicksand"
+		}
+	},
+	Button: {
+		titleStyle: {
+			fontFamily:"Quicksand-Medium"
+		}
+	}
+}
+
+const screenOptions = {
+	headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
+	headerStyle:{
+		borderBottomWidth:1,
+		borderBottomColor:theme.colors.grey2,
+	},
+	headerShown: true,
+	headerTintColor:"#000",
+	headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
+	headerTitleAlign:"center"
+}
 
 export default function App() {
 
@@ -42,29 +75,6 @@ export default function App() {
 		return null;
 	}
 
-
-	const theme = {
-		colors: {
-			primary: "#4AAE47",
-			secondary: "#63BE60",
-			white: "#fff",
-			black:"#000",
-			grey0:"#c8c8c8",
-			grey1:"#8F8F8F",
-			grey2: "#EBEBEB",
-			error: "#CC0000",
-		},
-		Text: {
-			style: {
-				fontFamily: "Quicksand"
-			}
-		},
-		Button: {
-			titleStyle: {
-				fontFamily:"Quicksand-Medium"
-			}
-		}
-	}
 	return (
 		<ThemeProvider theme={theme}>
 			<PantryContextProvider>
@@ -79,26 +89,14 @@ export default function App() {
  */
 
 const Wrapper = () => {
-	const {hasBeenInit, recipes} = usePantryContext();
-	const [loaded, setLoaded] = useState(false);
+	const {hasBeenInit} = usePantryContext();
 	const {theme} = useTheme();
 	
-	// const loadFonts = async() => {
-	// 	console.log("Loading fonts");
-	// 	let result = await Font.loadAsync({
-	// 		'Quicksand-Bold': require('./assets/fonts/Quicksand-Bold.ttf')
-	// 	});
-	// 	console.log("load ASync result", result);
-	// }
-	
-
-
 
 	return (
 		<>
 			<StatusBar
 				animated={true}
-				backgroundColor="#61dafb"
 				barStyle={"dark-content"}
 				showHideTransition={"fade"}
 				hidden={false} />
@@ -107,7 +105,7 @@ const Wrapper = () => {
 				translucent={true}
 				isLoaded={hasBeenInit}
 				logoImage={require("./assets/book2.png")}
-				backgroundColor={"#63BE60"}
+				backgroundColor={theme.colors.grey2}
 				logoHeight={200}
 				logoWidth={200}>
 				{NavigationSection()}
@@ -121,7 +119,6 @@ const NavigationSection = () => (
 	
 	<NavigationContainer>
 		<Tab.Navigator
-			tabOptions={{headerShown: true}}
 			screenOptions={({route}) => ({
 					
 				tabBarIcon: ({focused, color, size}) => {
@@ -139,8 +136,6 @@ const NavigationSection = () => (
 			
 			tabBarOptions={{
 				labelPosition:"below-icon",
-				headerShown:true,
-				headerBackTitle:" ",
 				headerTitleAlign:"center",
 				labelStyle: {
 					fontFamily:"Quicksand-Semibold",
@@ -159,14 +154,28 @@ const NavigationSection = () => (
 	
 );
 
+const HeaderTitle = (props) => {
+	return (
+		<View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
+			<Image style={{width:19, height:19}}  source={require('./assets/pantry.png')} />
+			<Text>ReseptiKirjan logo</Text>
+		</View>
+	)
+}
+
 const RecipeWrapper = () => {
 	const {theme} = useTheme();
 	return (
 		<Stack.Navigator
 			screenOptions={{
+				// headerTitle: props => <HeaderTitle {...props} />,
 				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
 				headerShown: true,
 				headerTintColor:theme.colors.black,
+				headerStyle:{
+					borderBottomWidth:1,
+					borderBottomColor:theme.colors.grey2,
+				},
 				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
 				headerTitleAlign:"center",
 				}}>
@@ -185,13 +194,7 @@ const PantryStack = createStackNavigator();
 const PantryWrapper = () => {
 	return (
 		<PantryStack.Navigator
-			screenOptions={{
-				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
-				headerShown: true,
-				headerTintColor:"#000",
-				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
-				headerTitleAlign:"center"}}>
-			
+			screenOptions={screenOptions}>
 			<PantryStack.Screen
 				name="Ruokakomero"
 				component={PantryScreen}
@@ -200,25 +203,3 @@ const PantryWrapper = () => {
 		</PantryStack.Navigator>
 	)
 }
-
-
-
-/**
-	Kun ladataan tiedot -> lähetetään keywordsit backendille ja tehdään ehkä sorttaus.
-	Nyt recipe-data on UI:ssa ja recipet statessa. 
-	Jos käyttäjä nyt menee ja vaihtaa ingredients-listaa pantry-sivulla, PantryContextissa muuttuu mahdollisesti
-	keywords-array.
-
-	Jos keywords array muuttuu:
-
-	- sorttaus ei välttämättä enää pidä paikkaansa (käyttäjä on sortannut ainesosien mukaan, ja sen jälkeen poistaa ainesosat)
-	
-	-> Fix:
-
-	useEffect-hookki kuuntelemaan jos keywords muuttuu, ja tehdään uusi recipe haku.
-
-	removeItemFromDeviceStorage - manipuloi suoraan AsyncStorageWorkeria
-
-	TODO: jos/kun listan sorttaus ja haluaa sortata ainesosien mukaan, triggeröi automaattisesti uudelleenhaku HETI kun keywords muuttuu
-	TODO: Jos pantryContext singleRecipe ei ole tyhjä ja vaihtaa keywords, triggeröi uudelleentarkistus ainesosille!!!!
- */

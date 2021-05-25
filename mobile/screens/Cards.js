@@ -3,6 +3,7 @@ import {
 	StyleSheet,
 	TextInput,
 	View,
+	SafeAreaView,
 	FlatList,
 	TouchableWithoutFeedback,
 	RefreshControl,
@@ -11,6 +12,8 @@ import {
 import {usePantryContext} from '../providers/PantryContext';
 import { colors, useTheme } from 'react-native-elements';
 import { Text, Card,SearchBar,CheckBox } from 'react-native-elements';
+import { Avatar } from "react-native-elements/dist/avatar/Avatar";
+import {MaterialIcons} from '@expo/vector-icons/';
 
 let x;
 export default function Cards({ navigation }) {
@@ -47,7 +50,7 @@ export default function Cards({ navigation }) {
 
 
 	return (
-		<View style={styles.cardsContainer}>
+		<SafeAreaView style={styles.cardsContainer}>
 			<FlatList
 				refreshControl={
 				<RefreshControl
@@ -74,13 +77,11 @@ export default function Cards({ navigation }) {
 				ListHeaderComponent={
 				<View style={styles.inputContainer}>
 					<SearchBar
-						containerStyle={{backgroundColor:theme.colors.white, borderBottomWidth:1,borderBottomColor:theme.colors.grey0}}
-						inputStyle={{fontFamily:"Quicksand"}}
-						// inputStyle={{fontSize:16, borderBottomColor: theme.colors.grey0}}
+						
+						containerStyle={{marginVertical:0,backgroundColor:theme.colors.white, borderBottomWidth:1,borderBottomColor:theme.colors.grey0}}
+						inputStyle={{fontFamily:"Quicksand-Medium"}}
+						
 						platform="android"
-						// inputStyle={{backgroundColor:theme.colors.grey2, fontFamily:"Quicksand", borderWidth:0}}
-						// round={true}
-						// leftIconContainerStyle={{backgroundColor:theme.colors.grey2, borderColor:theme.colors.grey2}}
 						placeholder="Millaista reseptiä etsit tänään?"
 						placeholderTextColor={"#888"}
 						onChangeText={changeSearchText}
@@ -88,11 +89,14 @@ export default function Cards({ navigation }) {
 					/>
 					
 
+					
+
 				</View>}
 				// style={{...styles.flatList}}
 				data={recipes}
 				keyExtractor={d => "recipe_" + d.id}
-				renderItem={(d) => (
+				renderItem={(d) => {
+					return (
 					<TouchableWithoutFeedback
 						onPress={() =>
 							navigation.navigate("Recipe", {
@@ -100,21 +104,34 @@ export default function Cards({ navigation }) {
 							})
 						}
 					>
-							<Card containerStyle={{marginHorizontal:0,paddingHorizontal:0,paddingBottom:0, borderTopColor: theme.colors.grey2,borderBottomColor: theme.colors.grey2}}>
+							<Card containerStyle={{margin:0, padding:0, borderLeftWidth:0, borderRightWidth:0, borderTopColor: theme.colors.grey2,borderBottomColor: theme.colors.grey2}}>
 								{/* <Card.Title style={{color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.Title> */}
-								<Card.FeaturedTitle style={{fontFamily:"Quicksand-Medium",color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.FeaturedTitle>
-								<Card.FeaturedSubtitle style={{color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title}</Card.FeaturedSubtitle>
-								<Card.Image wrapperStyle={{paddingVertical:0}} source={{uri:d.item.img}}>
+								{/* <View>
+									<Avatar 
+										rounded
+										source={{
+										uri:
+										'https://i.pravatar.cc/128',
+									}} />
+
+								</View> */}
+								<Card.Image wrapperStyle={{paddingVertical:0}} source={{uri: (d.index % 2 == 0 ? 'https://www.myllynparas.fi/sites/default/files/styles/mp_recipe_big_portrait/public/thumbnails/image/1436250483_pannukakku.jpg?itok=36hTXceu' : d.item.img)}}>
+								
 								</Card.Image>
+								<View style={{paddingTop:10, paddingBottom:10}}>
+									<Card.FeaturedTitle style={{fontFamily:"Quicksand-Medium",color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title} {d.item.title}</Card.FeaturedTitle>
+									<Card.FeaturedSubtitle style={{marginVertical:0,paddingVertical:0,color: theme.colors.black, textAlign:'left', marginLeft: 8}}>{d.item.title} {d.item.title}</Card.FeaturedSubtitle>
+								</View>
+								
 						</Card>
 
 						{/* <View>
 							<Card {...d.item} />
 						</View> */}
 					</TouchableWithoutFeedback>
-				)}
+				)}}
 			/>
-		</View>
+		</SafeAreaView>
 	 );
 }
 const styles = StyleSheet.create({
