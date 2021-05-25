@@ -246,15 +246,8 @@ app.post("/ingredients", upload.single('ingredient_image'), async function(req,r
 	const name = req.body.name;
 	const brand = req.body.brand;
 	const keywords = req.body.keywords instanceof Array ? req.body.keywords : [req.body.keywords];
-	
-
 	// console.log(req.file);
 	 console.log(EAN,name,brand,keywords);
-
-
-
-
-
 	try {
 		let client = await getClient();
 		const db = await client.db(MONGO_DB);	
@@ -274,7 +267,7 @@ app.post("/ingredients", upload.single('ingredient_image'), async function(req,r
 		'name': name.trim(),
 		'brand': brand.trim(),
 		'keywords': keywords,
-		'image_url': 'img/ingredients/' + EAN
+		'image_url': 'img/ingredient/' + EAN
 	};
 	try {
 		// console.log("REQ FILE:", req.file);

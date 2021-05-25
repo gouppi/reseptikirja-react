@@ -1,8 +1,7 @@
 import React, { useContext, createContext, useState, useEffect} from "react";
 import { getData, setData, PANTRY_KEY } from "../workers/AsyncStorageWorker";
 import {fetchRecipes as fetchRecipesAPIWorker,
-		fetchSingleRecipe as fetchSingleRecipeAPIWorker,
-		fetchIngredient as fetchIngredientAPIWorker} from '../workers/APIWorker';
+		fetchSingleRecipe as fetchSingleRecipeAPIWorker} from '../workers/APIWorker';
 
 
 const PantryContext = createContext({});

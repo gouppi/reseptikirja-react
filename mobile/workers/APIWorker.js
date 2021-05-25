@@ -91,10 +91,12 @@ export async function createIngredient(data) {
 	}
 	try {
 		const result = await axios.create(config).post(INGREDIENT_ENDPOINT, data);
-		return result.data;
+		console.log("RAW RESPONSE: ", result.data);
+		return result.data.item;
 	} catch (error) {
 		console.log("CREATE INGREDIENT ERROR, ", error);
 	}
+	return false;
 }
 
 module.exports.fetchIngredient = fetchIngredient;

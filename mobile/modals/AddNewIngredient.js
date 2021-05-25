@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import * as ImagePicker from 'expo-image-picker';
 import {fetchAllKeywords} from '../workers/APIWorker';
@@ -9,6 +9,7 @@ import {MaterialIcons} from '@expo/vector-icons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 
 import {createIngredient} from '../workers/APIWorker';
+import {usePantryContext} from '../providers/PantryContext';
 
 import {Text,Chip, Button, Overlay, useTheme } from 'react-native-elements';
 
@@ -22,12 +23,12 @@ export default function AddNewIngredient({EAN, navigation}) {
 	
 	// SectionedMultiSelect stores selected values as index-array. Store the actual object here.
 	const [keywordObjects, setKeywordObjects] = useState([]);
-
 	const [newIngredientName, setNewIngredientName] = useState("");
 	const [newIngredientBrand, setNewIngredientBrand] = useState("");
 
 	// Disable duplicate sends when user clicks submit button.
 	const [submitButtonEnabled, setSubmitButtonEnabled] = useState(true);
+	const {updateIngredients} = usePantryContext();
 	const {theme} = useTheme();
 
 	useEffect(() => {
@@ -45,30 +46,43 @@ export default function AddNewIngredient({EAN, navigation}) {
 	}, [])
 
 	const sendNewIngredientForm = async () => {
+		
+		if (! submitButtonEnabled) {
+			return;
+		}
 		const data = new FormData();
-
 		data.append('EAN', EAN);
 		data.append('name', newIngredientName);
 		data.append('brand', newIngredientBrand);
 		keywordObjects.forEach(item => {
 			data.append('keywords', item.keyword);
 		});
-
-		console.log(userSelectedImage);
-		// data.append('keywords',keywordObjects.map(kw => kw.keyword));
 		data.append('ingredient_image', {
 			name: userSelectedImage.uri.split('/').pop(),
 			type: userSelectedImage.type,
 			uri: Platform.OS === 'ios' ? userSelectedImage.uri.replace('file://', '') : userSelectedImage.uri,
 		});
-		
 		// TODO: disable submit button
 		setSubmitButtonEnabled(false);
 		let result = await createIngredient(data);
 		setSubmitButtonEnabled(true);
-		console.log(result);
-
+		console.log("Uuden ingredientin vastaustulos:", result);
+		if (result) {
+			await updateIngredients(result, "ADD");
+			navigation.goBack();
+		}
 	}
+
+	const NewKeywordPrompt = () => {
+		multiselect.current.
+		return (
+			<View style={{display:"flex", justifyContent:"center",alignItems:"center", height:"100%"}}>
+				<Text>Ei sopivaa avainsanaa.</Text>
+				<Text>Käytä toista avainsanaa tuotteelle.</Text>
+			</View>
+		);
+	}
+
 
 	let openImagePickerAsync = async (SOURCE) => {
 		// const {theme} = useTheme();
@@ -79,7 +93,7 @@ export default function AddNewIngredient({EAN, navigation}) {
 			console.log("Opening camera");
 			let permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 			if (permissionResult.granted === false) {
-				alert("Permission to use camer is required!");
+				alert("Permission to use camera is required!");
 				return;
 			}
 			pickerResult = await ImagePicker.launchCameraAsync({
@@ -130,7 +144,6 @@ export default function AddNewIngredient({EAN, navigation}) {
 			<Overlay
 				isVisible={modalVisible}
 				onBackdropPress={() => {
-					console.log("ON backdrop press!");
 					setModalVisible(false);
 				}}
 				>
@@ -143,13 +156,14 @@ export default function AddNewIngredient({EAN, navigation}) {
 				</View>
 			</Overlay>
 				<ProgressSteps>
-					<ProgressStep nextBtnTextStyle={{color: theme.colors.primary}} nextBtnText="Perustiedot" label="Kuva tuotteesta">
-						<View style={{ alignItems: 'center',flex:1,display:"flex" }}>
+					<ProgressStep nextBtnTextStyle={{color: theme.colors.primary}} nextBtnText="Seuraava >" label="Kuva tuotteesta">
+						<View style={{ alignItems: "center", justifyContent:"space-around", flexDirection:"column" }}>
 							<TouchableOpacity onPress={() => setModalVisible(true)} >
-								<View style={{marginVertical:20}}>
+								<View style={{display:"flex",justifyContent:"center",alignItems:"center",marginHorizontal:20}}>
 									{userSelectedImage ? (<Image source={userSelectedImage} style={{resizeMode:"contain"}} width={300} height={300} />) : <View style={{display:"flex",flexDirection:"column",textAlign:"center",justifyContent:"center",alignItems:"center",padding:20,borderWidth:5, backgroundColor:theme.colors.grey0}}><AntDesign name="camerao" size={120} color="black" /><Text style={{fontFamily:"Quicksand-Bold", fontSize:18}}>Ota kuva</Text></View>}
 								</View>
 							</TouchableOpacity>
+							{userSelectedImage && (<Text>(Vaihda valitsemasi kuva klikkaamalla sitä)</Text>)}
 						</View>
 					</ProgressStep>
 					<ProgressStep previousBtnTextStyle={{color: theme.colors.grey1}} nextBtnTextStyle={{color: theme.colors.primary}} previousBtnText="Kuva tuotteesta"  nextBtnText="Yhteenveto" label="Perustiedot">
@@ -165,7 +179,6 @@ export default function AddNewIngredient({EAN, navigation}) {
 									IconRenderer={MaterialIcons}
 									uniqueKey="id"
 									displayKey="keyword"
-									
 									modalWithSafeAreaView
 									selectText="Valitse avainsanat"
 									showChips={true}
@@ -212,7 +225,7 @@ export default function AddNewIngredient({EAN, navigation}) {
 									confirmText="Vahvista"
 									searchPlaceholderText="Etsi avainsanoja..."
 									removeAllText="Poista kaikki"
-									noResultsComponent={<View style={{display:"flex", justifyContent:"center",alignItems:"center", height:"100%"}}><Text>Ei sopivaa avainsanaa.</Text><Text>Käytä toista avainsanaa tuotteelle.</Text></View>}
+									noResultsComponent={<NewKeywordPrompt/>}
 									// readOnlyHeadings={true}
 									onSelectedItemsChange={(selectedItemObjects) =>  {if (selectedItemObjects.length > 3) return;  setSelectedKeywords(selectedItemObjects); setKeywordObjects(keywords.filter((kw) => selectedItemObjects.includes(kw.id))) }}
 									selectedItems={selectedKeywords}
@@ -222,7 +235,6 @@ export default function AddNewIngredient({EAN, navigation}) {
 					</ProgressStep>
 					<ProgressStep previousBtnText="Perustiedot" finishBtnText="Hyväksy" onSubmit={sendNewIngredientForm}  label="Yhteenveto">
 						<View style={{marginVertical: 20, marginHorizontal: 8,alignItems: 'center' }}>
-							
 							<View style={styles.ingredient}>
 								<Text style={{fontFamily:"Quicksand-Semibold", fontSize:18,marginBottom:10}}>Näyttääkö tämä hyvältä?</Text>
 								<Image

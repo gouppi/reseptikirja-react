@@ -30,7 +30,7 @@ export default function Pantry({navigation}) {
 	const barCodeScanned = async ({type, data}) => {
 		setScanningMode(false);
 		console.log("SENDING NAVIGATION: ", navigation);
-		navigation.navigate('Ainesosa', {newEan: data, navigation: navigation});
+		navigation.navigate('Ainesosa', {newEan: data});
 	}
 
 	// User is leaving from Pantry, if camera is enabled, hide it.
