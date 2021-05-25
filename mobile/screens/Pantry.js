@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
 	StyleSheet,
 	Text,
@@ -32,6 +32,15 @@ export default function Pantry({navigation}) {
 		console.log("SENDING NAVIGATION: ", navigation);
 		navigation.navigate('Ainesosa', {newEan: data, navigation: navigation});
 	}
+
+	// User is leaving from Pantry, if camera is enabled, hide it.
+	useEffect(() => {
+		const unsubscribe = navigation.addListener('blur', () => {
+			setScanningMode(false);
+		});
+		return unsubscribe;
+	  }, [navigation]);
+
 
 	return (
 		<SafeAreaView style={styles.container}>
