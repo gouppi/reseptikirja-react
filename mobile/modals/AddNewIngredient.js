@@ -66,10 +66,13 @@ export default function AddNewIngredient({EAN, navigation}) {
 		setSubmitButtonEnabled(false);
 		let result = await createIngredient(data);
 		setSubmitButtonEnabled(true);
-		console.log("Uuden ingredientin vastaustulos:", result);
+		
 		if (result) {
 			await updateIngredients(result, "ADD");
 			navigation.goBack();
+		} else {
+			// TODO: ingredient send was not successful. Show some kind of toast message to user indicating, that 
+			// The save wasn't successful, and that they should try the save again in few seconds.
 		}
 	}
 
@@ -233,7 +236,7 @@ export default function AddNewIngredient({EAN, navigation}) {
 							</View>
 						</View>
 					</ProgressStep>
-					<ProgressStep previousBtnText="Perustiedot" finishBtnText="Hyväksy" onSubmit={sendNewIngredientForm}  label="Yhteenveto">
+					<ProgressStep error={submitButtonEnabled} previousBtnText="Perustiedot" finishBtnText="Hyväksy" onSubmit={sendNewIngredientForm}  label="Yhteenveto">
 						<View style={{marginVertical: 20, marginHorizontal: 8,alignItems: 'center' }}>
 							<View style={styles.ingredient}>
 								<Text style={{fontFamily:"Quicksand-Semibold", fontSize:18,marginBottom:10}}>Näyttääkö tämä hyvältä?</Text>

@@ -246,8 +246,7 @@ app.post("/ingredients", upload.single('ingredient_image'), async function(req,r
 	const name = req.body.name;
 	const brand = req.body.brand;
 	const keywords = req.body.keywords instanceof Array ? req.body.keywords : [req.body.keywords];
-	// console.log(req.file);
-	 console.log(EAN,name,brand,keywords);
+	console.log("POST INGREDIENTS:", EAN,name,brand,keywords);
 	try {
 		let client = await getClient();
 		const db = await client.db(MONGO_DB);	
@@ -270,21 +269,19 @@ app.post("/ingredients", upload.single('ingredient_image'), async function(req,r
 		'image_url': 'img/ingredient/' + EAN
 	};
 	try {
-		// console.log("REQ FILE:", req.file);
 		let data = await sharp(req.file.path).resize(300,null).jpeg().toBuffer();
 		let result = await S3BUCKET.putObject({Bucket: S3_BUCKET_NAME + '/ingredients',  Key: req.body.EAN + '.jpg', Body: data}).promise();
-		// console.log("S3Bucket PutObject result:", result);
 		let client = await getClient();
 		const db = await client.db(MONGO_DB);
 		await db.collection('ingredients').insertOne(item);
-		// console.log("InsertOne REsult:", result);
+		return res.json({item: item})
 	} 
 	catch (err) {
-		console.log(err);
+		console.log(err);		
+		res.status(500).send(err);
 	} finally {
 		await unlinkAsync(req.file.path);
 	}
-	return res.json({item: item})
 });
 
 
