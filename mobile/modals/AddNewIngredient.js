@@ -31,6 +31,8 @@ export default function AddNewIngredient({EAN, navigation}) {
 	const {updateIngredients} = usePantryContext();
 	const {theme} = useTheme();
 
+	const searchRef = useRef(null);
+
 	useEffect(() => {
 		console.log("Haen kaikki avainsanat");
 		const workerCall = async () => {
@@ -77,11 +79,14 @@ export default function AddNewIngredient({EAN, navigation}) {
 	}
 
 	const NewKeywordPrompt = () => {
-		multiselect.current.
+		console.log(searchRef.current._getSearchTerm())
 		return (
-			<View style={{display:"flex", justifyContent:"center",alignItems:"center", height:"100%"}}>
-				<Text>Ei sopivaa avainsanaa.</Text>
-				<Text>Käytä toista avainsanaa tuotteelle.</Text>
+			<View style={{display:"flex", justifyContent:"center", alignItems:"center"}}>
+				<View style={{display:"flex", flexDirection:"row",width:"100%", justifyContent:"space-between",marginVertical:6,paddingVertical:6}}>
+					<Text> {searchRef.current._getSearchTerm()}</Text>
+					<AntDesign name="addfile" size={20}/>
+				</View>
+				<Text>(Luo uusi avainsana klikkaamalla ikonia.)</Text>
 			</View>
 		);
 	}
@@ -163,7 +168,14 @@ export default function AddNewIngredient({EAN, navigation}) {
 						<View style={{ alignItems: "center", justifyContent:"space-around", flexDirection:"column" }}>
 							<TouchableOpacity onPress={() => setModalVisible(true)} >
 								<View style={{display:"flex",justifyContent:"center",alignItems:"center",marginHorizontal:20}}>
-									{userSelectedImage ? (<Image source={userSelectedImage} style={{resizeMode:"contain"}} width={300} height={300} />) : <View style={{display:"flex",flexDirection:"column",textAlign:"center",justifyContent:"center",alignItems:"center",padding:20,borderWidth:5, backgroundColor:theme.colors.grey0}}><AntDesign name="camerao" size={120} color="black" /><Text style={{fontFamily:"Quicksand-Bold", fontSize:18}}>Ota kuva</Text></View>}
+									{userSelectedImage ? (
+										<Image source={userSelectedImage} style={{resizeMode:"contain"}} width={300} height={300} />
+										) : 
+										<View style={{display:"flex",flexDirection:"column",textAlign:"center",justifyContent:"center",alignItems:"center",padding:20,borderWidth:5, backgroundColor:theme.colors.grey0}}>
+											<AntDesign name="camerao" size={120} color="black" />
+											<Text style={{fontFamily:"Quicksand-Bold", fontSize:18}}>Ota kuva</Text>
+										</View>
+									}
 								</View>
 							</TouchableOpacity>
 							{userSelectedImage && (<Text>(Vaihda valitsemasi kuva klikkaamalla sitä)</Text>)}
@@ -178,6 +190,7 @@ export default function AddNewIngredient({EAN, navigation}) {
 							<Text style={{fontSize:12,marginBottom:10}}>Mitä avainsanat ovat?</Text>
 							<View style={{flex:1, width:"100%", fontSize:16,fontWeight:"600",paddingHorizontal:20,borderRadius:5,borderWidth:1,borderColor:"#ccc",paddingVertical:10,marginVertical:10,backgroundColor:"#fff"}}>
 								<SectionedMultiSelect
+									ref={searchRef}
 									items={keywords}
 									IconRenderer={MaterialIcons}
 									uniqueKey="id"

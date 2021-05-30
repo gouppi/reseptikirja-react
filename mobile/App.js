@@ -7,12 +7,17 @@ import AnimatedSplash from "react-native-animated-splash-screen";
 import { SingleRecipe as RecipeScreen } from './screens/SingleRecipe';
 import CardsScreen from './screens/Cards';
 import PantryScreen from './screens/Pantry';
+import NewRecipeScreen from './screens/NewRecipe';
 import IngredientModal from './modals/IngredientModal';
 import {usePantryContext, PantryContextProvider} from './providers/PantryContext';
 import {ThemeProvider} from 'react-native-elements';
 import { useFonts } from 'expo-font';
 import { useTheme } from 'react-native-elements';
 import 'react-native-gesture-handler';
+import AddNewRecipeIngredient from './modals/AddNewRecipeIngredient';
+
+import Toast from 'react-native-toast-message';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -63,15 +68,20 @@ export default function App() {
 		"Quicksand-Semibold": require('./assets/fonts/Quicksand-SemiBold.ttf'),
 	});
 
+		
+	  
+
 	if (!fontLoaded) {
 		return null;
 	}
 
 	return (
 		<ThemeProvider theme={theme}>
+
 			<PantryContextProvider>
 				<Wrapper/>
 			</PantryContextProvider>
+			<Toast ref={(ref) => Toast.setRef(ref)} />
 		</ThemeProvider>
 	);
 }
@@ -80,11 +90,15 @@ export default function App() {
  * Wrapper component is used only because we need App component to initialize context before.
  */
 
-const Wrapper = () => {
+const Wrapper = (props) => {
 	const {hasBeenInit} = usePantryContext();
 	const {theme} = useTheme();
+
+	
+
 	return (
 		<>
+			
 			<StatusBar
 				animated={true}
 				barStyle={"dark-content"}
@@ -106,6 +120,8 @@ const Wrapper = () => {
 
 
 const NavigationSection = () => (
+	
+	
 
 	<NavigationContainer>
 		<Tab.Navigator
@@ -117,7 +133,9 @@ const NavigationSection = () => (
 						return <Image style={{width:26, height:19}}  source={require('./assets/recipes.png')} />
 					} else if (route.name == 'Ruokakomero') {
 						return <Image style={{width:19, height:19}}  source={require('./assets/pantry.png')} />
-					}
+					} else if (route.name == "Uusi Resepti") {
+						return <Image style={{width:20, height:20}}  source={require('./assets/add.png')} />
+					} 
 					// You can return any component that you like here!
 					// return <Ionicons name={iconName} size={size} color={color}/>;
 					
@@ -132,26 +150,44 @@ const NavigationSection = () => (
 					fontSize:12,
 					paddingBottom:2
 				},
-				
-				activeTintColor: '#000',
+				activeTintColor: theme.colors.primary,
 				inactiveTintColor:'gray',
 			}}
 			>
 			<Tab.Screen name="Reseptit" component={RecipeWrapper}  />
+			<Tab.Screen name="Uusi Resepti" component={NewRecipeWrapper} />
 			<Tab.Screen name="Ruokakomero" component={PantryWrapper} />
 		</Tab.Navigator>
 	</NavigationContainer>
 	
 );
 
-// const HeaderTitle = (props) => {
-// 	return (
-// 		<View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-// 			<Image style={{width:19, height:19}}  source={require('./assets/pantry.png')} />
-// 			<Text>ReseptiKirjan logo</Text>
-// 		</View>
-// 	)
-// }
+const NewRecipeWrapper = () => {
+	const {theme} = useTheme();
+	return (
+		<Stack.Navigator
+			screenOptions={{
+				headerTitleStyle:{fontFamily:"Quicksand-Bold", letterSpacing:0.5},
+				headerShown: true,
+				headerTintColor:theme.colors.black,
+				headerStyle:{
+					borderBottomWidth:1,
+					borderBottomColor:theme.colors.grey2,
+				},
+				headerBackTitle:" ", // iOS shows "Back" if this isn't set as empty string
+				headerTitleAlign:"center",
+			}}>	
+			<Stack.Screen
+				name="Uusi Resepti"
+				component={NewRecipeScreen} />
+			<Stack.Screen
+				name="Lisää ainesosa"
+				component={AddNewRecipeIngredient} />
+		</Stack.Navigator>
+	)
+}
+
+
 
 const RecipeWrapper = () => {
 	const {theme} = useTheme();
