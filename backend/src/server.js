@@ -10,7 +10,7 @@ const unlinkAsync = promisify(fs.unlink)
 /** MONGO DB CONFIG */
 const MongoClient = require('mongodb').MongoClient;
 const MONGO_USER = "lounaskartta";
-const MONGO_PASS = 'wuMhSVFYwFYxT6Y4';
+const MONGO_PASS = '';
 const MONGO_DB = 'reseptikirja';
 const MONGO_URI = `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@cluster0.zhemz.gcp.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`;
 const PORT = process.env.PORT || 3434;
